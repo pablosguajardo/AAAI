@@ -22,9 +22,25 @@ The list of apps is a simple catalog bundled with the app. Each entry points eit
 
 ## Getting started
 
-1. Download the latest APK from the project's releases page.
-2. Install it and follow the setup guide on first launch.
+AAAI is not distributed through the Google Play Store, so Android will ask for a few extra permissions the first time. Follow these steps **before installing**:
+
+### Before installing
+
+1. **Download the APK** from the project's releases page, using your phone's browser.
+2. **Allow installing apps from unknown sources.** When you open the downloaded APK, Android will show a prompt asking to allow your browser (or file manager) to install apps. Tap **Settings** and enable **Allow from this source**, then go back and continue. The exact wording and menu location vary by manufacturer and Android version (usually *Settings > Apps > Special access > Install unknown apps*).
+3. **If Google Play Protect blocks the installation**, you may see a message like "Blocked by Play Protect" or "App not trusted". This happens because the app is not published on the Play Store. To continue:
+   - Tap **More details** (or **Details**), then **Install anyway**; or
+   - Temporarily turn off scanning: open the **Google Play Store**, tap your profile picture, go to **Play Protect > Settings (gear icon)** and disable **Scan apps with Play Protect**. You can turn it back on after installing.
+4. **Install the app** and open it.
+
+### Using AAAI
+
+1. On first launch, follow the setup guide shown by the app.
+2. Allow AAAI itself to install apps when it asks (the same "unknown sources" permission, this time for AAAI).
 3. Pick an app from the list and tap **Install**, or use the URL field / file picker to install your own APK.
+4. Apps installed through AAAI may also trigger Play Protect warnings. Use **Install anyway** if you trust the app.
+
+> Only install apps from sources you trust. Turning off Play Protect lowers your phone's protection, so re-enable it when you are done.
 
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_1.jpg" alt="App1" width="250"><img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_2.jpg" alt="App2" width="250">
 
