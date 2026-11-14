@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+: back up ONLY the install counter (cloud backup and device transfer) -->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="sharedpref" path="aaai_install_counter.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="aaai_install_counter.xml" />
+    </device-transfer>
+</data-extraction-rules>

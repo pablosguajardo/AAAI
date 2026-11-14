@@ -1,0 +1,9 @@
+﻿.gradle
+local.properties
+app/build
+app/release
+.idea
+.vscode
+build
+*.bak
+.kotlin

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 and lower: back up ONLY the install counter -->
+<full-backup-content>
+    <include domain="sharedpref" path="aaai_install_counter.xml" />
+</full-backup-content>

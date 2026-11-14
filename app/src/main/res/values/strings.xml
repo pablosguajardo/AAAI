@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">AA Apps Installer</string>
+
+    <!-- About screen -->
+    <string name="title_activity_about_payment">About AAAI</string>
+    <!-- TODO: point this to the new repository once it is created -->
+    <string name="project_url" translatable="false">https://github.com/pablosguajardo/AAAI</string>
+    <string name="about_intro">AAAI (Android Auto Apps Installer) is a utility to download and install custom apps for Android Auto on non-rooted phones.</string>
+    <string name="about_project_title">Project</string>
+    <string name="about_disclaimer_title">Disclaimer</string>
+    <string name="about_disclaimer">This project is provided for testing and evaluation purposes only. It is offered "as is", without warranty of any kind, express or implied. The author assumes no responsibility or liability for any damage, data loss, malfunction, or other consequences resulting from the use of this app or of any app installed through it. Use it at your own risk.\n\nThe apps listed here belong to their respective developers. This project is not affiliated with, endorsed by, or sponsored by any of them or by Google. Please refer to each project for its own license and terms.</string>
+    <string name="about_ads_title">Advertising</string>
+    <string name="about_ads">This app shows a small banner ad and, once in a while (every few installs), a full-screen ad so that development can continue. Ads are provided by Start.io. Thank you for your support!</string>
+    <string name="about_thirdparty_title">Third-party apps</string>
+    <string name="about_thirdparty_intro">Some apps are downloaded directly from the releases of these GitHub repositories. Tap a repository to open it:</string>
+    <string name="about_no_repos">No GitHub-based apps found.</string>
+</resources>

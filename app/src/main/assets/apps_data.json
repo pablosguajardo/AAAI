@@ -1,0 +1,123 @@
+{
+    "app_metadata": [
+        
+        {
+            "appId": "CarStream",
+            "appName": "CarStream",
+            "packageName": "com.google.android.kk",
+            "iconUrl": "https://raw.githubusercontent.com/thekirankumar/carstream-android-auto/refs/heads/master/app/src/main/ic_launcher-web.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "thekirankumar/carstream-android-auto"
+        },
+        {
+            "appId": "fermata",
+            "appName": "Fermata Auto",
+            "packageName": "me.aap.fermata.auto.dear.google.why",
+            "description": "Get out of Android Auto without leaving the car.",
+            "iconUrl": "https://avatars.githubusercontent.com/u/9082363?v=4",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "AndreyPavlenko/Fermata"
+        },
+        {
+            "appId": "ScreenOnAuto-releases",
+            "appName": "ScreenOnAuto releases",
+            "packageName": "ScreenOnAuto",
+            "iconUrl": "https://raw.githubusercontent.com/slzn/ScreenOnAuto-releases/refs/heads/main/images/icon_legacy.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MIRRORING",
+            "githubRepo": "slzn/ScreenOnAuto-releases"
+        },
+        {
+            "appId": "pm",
+            "appName": "Performance Monitor",
+            "packageName": "com.mqbcoding.stats",
+            "description": "Monitors system performance on Android Auto.",
+            "iconUrl": "https://raw.githubusercontent.com/jilleb/mqb-pm/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "jilleb/mqb-pm"
+        },
+        {
+            "appId": "aatorque",
+            "appName": "AATorque",
+            "packageName": "com.aatorque.stats",
+            "description": "AATorque brings the OBD-II vehicle diagnostics app Torque Pro to Android Auto. Monitor your vehicle's performance, view diagnostic data and access real-time vehicle information right from your car's display.",
+            "iconUrl": "https://raw.githubusercontent.com/agronick/aa-torque/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "agronick/aa-torque"
+        },
+        {
+            "appId": "aap",
+            "appName": "AA Passenger",
+            "packageName": "com.github.martoreto.aaremote",
+            "description": "Unlocks Android Auto while in driving mode.",
+            "iconUrl": "https://avatars.githubusercontent.com/u/6421042?v=4",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "martoreto/aapassenger"
+        },
+        {
+            "appId": "aabrowser",
+            "appName": "AA Browser",
+            "packageName": "com.kododake.aabrowser",
+            "description": "Browse the web on Android Auto.",
+            "iconUrl": "https://raw.githubusercontent.com/kododake/AABrowser/refs/heads/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "kododake/AABrowser"
+        },
+        {
+            "appId": "aawidgets",
+            "appName": "Widgets For Android Auto",
+            "packageName": "de.nsvb.android.auto.w4a",
+            "description": "Born with a single task: bring a widget to Android Auto!",
+            "iconUrl": "https://raw.githubusercontent.com/ns130291/widgets-for-auto/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "ns130291/widgets-for-auto"
+        },
+        {
+            "appId": "n2c",
+            "appName": "Nav2Contacts",
+            "packageName": "nl.frankkie.nav2contacts",
+            "description": "Quickly navigate to your contacts.",
+            "iconUrl": "https://avatars.githubusercontent.com/u/1390975?v=4",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "frankkienl/Nav2Contacts"
+        },
+        {
+            "appId": "homecar",
+            "appName": "HomeCar",
+            "packageName": "com.renanespinar.homecar.auto.debug",
+            "description": "Open-source Home Assistant dashboard for Android Auto with a configurable full-screen WebView.",
+            "iconUrl": "",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "RenanEspinar/HomeCar"
+        },
+        {
+            "appId": "",
+            "appName": "extras4aa-Extras for AA",
+            "packageName": "aaextras.rizzo.gabriele",
+            "description": "Substratum theme to personalize the look of Android Auto.",
+            "iconUrl": "",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "shmykelsa/extrasforaa-release"
+        },
+        {
+            "appId": "AAAnything",
+            "appName": "AAAnything",
+            "packageName": "com.AAAnything.app",
+            "description": "Quickly navigate to your contacts.",
+            "iconUrl": "https://raw.githubusercontent.com/kododake/AAAnything/refs/heads/main/assets/favicon.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "kododake/AAAnything"
+        }
+    ]
+}

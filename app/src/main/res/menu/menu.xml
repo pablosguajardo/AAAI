@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/infos"
+        android:title="About"/>
+
+    <item
+        android:id="@+id/show_intro"
+        android:title="Show setup instructions"/>
+
+    <item
+        android:id="@+id/version"
+        android:title="v1.0"
+        android:enabled="false" />
+
+</menu>
