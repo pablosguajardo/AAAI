@@ -26,6 +26,16 @@ The list of apps is a simple catalog bundled with the app. Each entry points eit
 2. Install it and follow the setup guide on first launch.
 3. Pick an app from the list and tap **Install**, or use the URL field / file picker to install your own APK.
 
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_1.jpg" alt="App1" width="250"><img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_2.jpg" alt="App2" width="250">
+
+
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_1.jpeg" alt="Screen_1" width="1024">
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_2.jpeg" alt="Screen_2" width="1024">
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_3.jpeg" alt="Screen_3" width="1024">
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_4.jpeg" alt="Screen_4" width="1024">
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_5.jpeg" alt="Screen_5" width="1024">
+
+
 ## Advertising
 
 AAAI shows a small banner ad at the bottom of the main screen and, once in a while (every few installs), a full-screen ad so that development can continue. Ads are provided by [Start.io](https://www.start.io). Thank you for your support!
