@@ -33,6 +33,8 @@ AAAI is not distributed through the Google Play Store, so Android will ask for a
    - Temporarily turn off scanning: open the **Google Play Store**, tap your profile picture, go to **Play Protect > Settings (gear icon)** and disable **Scan apps with Play Protect**. You can turn it back on after installing.
 4. **Install the app** and open it.
 
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_3.jpg" alt="App3" width="250"><img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_4.jpg" alt="App4" width="250">
+
 ### Using AAAI
 
 1. On first launch, follow the setup guide shown by the app.
