@@ -26,7 +26,7 @@ AAAI is not distributed through the Google Play Store, so Android will ask for a
 
 ### Before installing
 
-1. **Download the APK** from the project's releases page, using your phone's browser.
+1. **Download the APK** from the project's releases page, using your phone's browser. [Download Latest](https://github.com/pablosguajardo/AAAI/releases/latest)
 2. **Allow installing apps from unknown sources.** When you open the downloaded APK, Android will show a prompt asking to allow your browser (or file manager) to install apps. Tap **Settings** and enable **Allow from this source**, then go back and continue. The exact wording and menu location vary by manufacturer and Android version (usually *Settings > Apps > Special access > Install unknown apps*).
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_5.jpg" alt="App5" width="250">
 3. **If Google Play Protect blocks the installation**, you may see a message like "Blocked by Play Protect" or "App not trusted". This happens because the app is not published on the Play Store. To continue:
