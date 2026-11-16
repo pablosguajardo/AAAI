@@ -28,6 +28,7 @@ AAAI is not distributed through the Google Play Store, so Android will ask for a
 
 1. **Download the APK** from the project's releases page, using your phone's browser.
 2. **Allow installing apps from unknown sources.** When you open the downloaded APK, Android will show a prompt asking to allow your browser (or file manager) to install apps. Tap **Settings** and enable **Allow from this source**, then go back and continue. The exact wording and menu location vary by manufacturer and Android version (usually *Settings > Apps > Special access > Install unknown apps*).
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_5.jpg" alt="App5" width="250">
 3. **If Google Play Protect blocks the installation**, you may see a message like "Blocked by Play Protect" or "App not trusted". This happens because the app is not published on the Play Store. To continue:
    - Tap **More details** (or **Details**), then **Install anyway**; or
    - Temporarily turn off scanning: open the **Google Play Store**, tap your profile picture, go to **Play Protect > Settings (gear icon)** and disable **Scan apps with Play Protect**. You can turn it back on after installing.
@@ -52,6 +53,9 @@ AAAI is not distributed through the Google Play Store, so Android will ask for a
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_3.jpeg" alt="Screen_3" width="1024">
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_4.jpeg" alt="Screen_4" width="1024">
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_5.jpeg" alt="Screen_5" width="1024">
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_6.jpeg" alt="Screen_6" width="1024">
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_7.jpeg" alt="Screen_7" width="1024">
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_8.jpeg" alt="Screen_8" width="1024">
 
 
 ## Advertising
@@ -73,6 +77,19 @@ The apps listed in AAAI belong to their respective developers. Many of them are 
 - [Widgets For Android Auto](https://github.com/ns130291/widgets-for-auto) – ns130291/widgets-for-auto
 - [Nav2Contacts](https://github.com/frankkienl/Nav2Contacts) – frankkienl/Nav2Contacts
 - [HomeCar](https://github.com/RenanEspinar/HomeCar) – RenanEspinar/HomeCar
+- [YT Auto](https://github.com/begati/yt-auto) – begati/yt-auto
+- [7x Lyrics](https://github.com/c9hama/7x-Lyrics) – c9hama/7x-Lyrics
+- [RadioDroid](https://github.com/morckx/RadioDroid) – morckx/RadioDroid
+- [YouTube Companion](https://github.com/seinist/youtube-companion) – seinist/youtube-companion
+- [AA Browser CarWeb](https://github.com/fcaronte/AABrowser) – fcaronte/AABrowser
+- [Fermata-Xtream](https://github.com/malebuffy/Fermata-Xtream) – malebuffy/Fermata-Xtream
+- [Meld](https://github.com/FrancescoGrazioso/Meld) – FrancescoGrazioso/Meld
+- [SpotiDuck](https://github.com/23fpsz/SpotiDuck-Releases) – 23fpsz/SpotiDuck-Releases
+- [Metrolist](https://github.com/MetrolistGroup/Metrolist) – MetrolistGroup/Metrolist
+- [Vela Maps](https://github.com/PimpinPumpkin/Vela) – PimpinPumpkin/Vela
+- [RF Sentinel](https://github.com/CIS-C0/RFSentinel) – CIS-C0/RFSentinel
+- [Nuomi Player](https://github.com/charlottejas/NuomiPlayer) – charlottejas/NuomiPlayer
+- [Lumora Player](https://github.com/LumoraPlayer/Lumora) – LumoraPlayer/Lumora
 
 
 This project is **not affiliated with, endorsed by, or sponsored by** any of them. Please check each project's repository for its own license and terms.
