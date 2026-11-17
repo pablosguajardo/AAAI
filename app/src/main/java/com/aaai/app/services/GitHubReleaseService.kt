@@ -81,22 +81,40 @@ class GitHubReleaseService(private val context: Context) {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    private fun cacheFile(repo: String): File {
+    private fun cacheFile(repo: String, cacheTag: String = ""): File {
         val safe = repo.replace(Regex("[^A-Za-z0-9._-]"), "_")
-        return File(context.cacheDir, "gh_releases_$safe.json")
+        val suffix = if (cacheTag.isEmpty()) "" else "_$cacheTag"
+        return File(context.cacheDir, "gh_releases_$safe$suffix.json")
+    }
+
+    /**
+     * Milliseconds left before the cache identified by [cacheTag] expires for the given [ttlMs].
+     * 0 if there is no cache or it is already expired (the next call will query GitHub).
+     */
+    fun cacheRemainingMs(repo: String, cacheTag: String, ttlMs: Long): Long {
+        val cache = cacheFile(repo, cacheTag)
+        if (!cache.exists()) return 0L
+        val age = System.currentTimeMillis() - cache.lastModified()
+        return (ttlMs - age).coerceAtLeast(0L)
     }
 
     /**
      * Returns releases (newest first). Uses the on-disk cache while it is younger than 24h
      * (unless [forceRefresh]); falls back to an expired cache if GitHub is unreachable.
      */
-    suspend fun getReleases(repo: String, forceRefresh: Boolean = false): List<Release> =
+    suspend fun getReleases(
+        repo: String,
+        forceRefresh: Boolean = false,
+        cacheTag: String = "",
+        ttlMs: Long = CACHE_TTL_MS
+    ): List<Release> =
         withContext(Dispatchers.IO) {
             lastWarning = null
-            val cache = cacheFile(repo)
+            // A non-empty cacheTag uses its own cache file, independent from the default one
+            val cache = cacheFile(repo, cacheTag)
             val cacheAge = if (cache.exists()) System.currentTimeMillis() - cache.lastModified() else Long.MAX_VALUE
 
-            if (!forceRefresh && cacheAge < CACHE_TTL_MS) {
+            if (!forceRefresh && cacheAge < ttlMs) {
                 try {
                     Log.d(TAG, "Using cached releases for $repo (age ${cacheAge / 60000} min)")
                     return@withContext parse(cache.readText())

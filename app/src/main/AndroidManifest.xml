@@ -60,10 +60,10 @@
 
         <!-- About / Info screen (kept for menu item) -->
         <activity
-            android:name=".AboutPaymentActivity"
+            android:name=".AboutActivity"
             android:screenOrientation="portrait"
             android:exported="false"
-            android:label="@string/title_activity_about_payment" />
+            android:label="@string/title_activity_about" />
 
         <!-- FileProvider for APK sharing with system installer -->
         <provider

@@ -45,6 +45,17 @@ object InstalledVersionTracker {
         }
     }
 
+    /**
+     * For apps installed before versions were tracked: assume the installed copy matches [version]
+     * (so "Open" is shown) unless an install is pending or a version is already recorded.
+     */
+    fun ensureBaseline(ctx: Context, appId: String, version: String) {
+        val p = prefs(ctx)
+        if (p.getString("installed_$appId", null) != null) return
+        if (p.getString("pending_tag_$appId", null) != null) return
+        p.edit().putString("installed_$appId", version).apply()
+    }
+
     /** Called when the app is no longer installed. */
     fun clearInstalled(ctx: Context, appId: String) {
         prefs(ctx).edit().remove("installed_$appId").apply()

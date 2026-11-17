@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.core.content.FileProvider
+import com.aaai.app.autoconv.AutoConverter
+import com.aaai.app.autoconv.AutoMode
 import com.aaai.app.data.AppMetadata
 import com.aaai.app.utils.ApkPackageRenamer
 import com.aaai.app.utils.ApkSignerV2
@@ -13,6 +15,7 @@ import com.aaai.app.utils.ApkValidator
 import com.aaai.app.utils.HttpStatusException
 import com.aaai.app.utils.InstalledVersionTracker
 import com.aaai.app.utils.NetworkErrors
+import com.aaai.app.utils.PackageNaming
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -38,6 +41,7 @@ class DownloadAndInstallService(private val context: Context) {
 
         private const val CUSTOM_URL_KEY = "custom_url"
         private const val CUSTOM_FILE_KEY = "custom_file"
+        private const val SELF_UPDATE_PREFIX = "aaai_self_update_"
     }
 
     private val client = OkHttpClient.Builder()
@@ -68,7 +72,11 @@ class DownloadAndInstallService(private val context: Context) {
                 Log.d(TAG, "Downloaded: ${downloadedApk.length()} bytes")
             }
 
-            val apkToInstall = prepareForInstall(downloadedApk, app.packageName, app.appId, onProgress)
+            val apkToInstall = prepareForInstall(
+                downloadedApk, app.packageName, app.appId, onProgress, AutoMode.fromAction(app.action)
+            )
+            // FILE apps: remember the catalog version being installed (confirmed once the package is updated)
+            if (app.version.isNotEmpty()) InstalledVersionTracker.setPending(context, app.appId, app.version)
             onProgress(95, "Ready to install")
             onReadyToInstall(apkToInstall)
         } catch (e: Exception) {
@@ -108,7 +116,9 @@ class DownloadAndInstallService(private val context: Context) {
                 }
             }
 
-            val apkToInstall = prepareForInstall(downloadedApk, app.packageName, app.appId, onProgress)
+            val apkToInstall = prepareForInstall(
+                downloadedApk, app.packageName, app.appId, onProgress, AutoMode.fromAction(app.action)
+            )
             // Remember which version is being installed; confirmed once the package is updated
             InstalledVersionTracker.setPending(context, app.appId, tag)
             onProgress(95, "Ready to install")
@@ -119,12 +129,70 @@ class DownloadAndInstallService(private val context: Context) {
         }
     }
 
+    /**
+     * Self-update flow: downloads the new AAAI APK and hands it over AS IS.
+     * It is NOT renamed or re-signed: Android only accepts an update of the installed app
+     * if the package name and signing key are the original ones.
+     */
+    suspend fun installSelfUpdate(
+        tag: String,
+        assetUrl: String,
+        forceDownload: Boolean = false,
+        onProgress: (Int, String) -> Unit,
+        onReadyToInstall: (File) -> Unit,
+        onError: (String) -> Unit
+    ) = withContext(Dispatchers.IO) {
+        val apk = selfUpdateFile(tag)
+        try {
+            if (forceDownload) apk.delete()
+            if (apk.exists() && apk.length() > 0) {
+                onProgress(90, "Using downloaded AAAI $tag...")
+            } else {
+                // Remove copies of other versions before downloading
+                context.cacheDir.listFiles { f -> f.name.startsWith(SELF_UPDATE_PREFIX) }
+                    ?.forEach { it.delete() }
+                onProgress(0, "Downloading AAAI $tag...")
+                downloadApk(assetUrl, apk) { progress ->
+                    onProgress(progress, "Downloading AAAI $tag... $progress%")
+                }
+            }
+            onProgress(90, "Validating APK...")
+            val validation = ApkValidator.validate(context, apk)
+            if (!validation.valid) {
+                apk.delete()
+                onError(validation.error ?: "The file is not a valid APK")
+                return@withContext
+            }
+            if (validation.packageName != context.packageName) {
+                apk.delete()
+                onError("The downloaded file is not an AAAI update (package ${validation.packageName}).")
+                return@withContext
+            }
+            onProgress(95, "Ready to install")
+            onReadyToInstall(apk)
+        } catch (e: Exception) {
+            Log.e(TAG, "Self-update error", e)
+            apk.delete()
+            onError("Could not download the update. ${NetworkErrors.describe(e)}")
+        }
+    }
+
+    private fun selfUpdateFile(tag: String): File {
+        val safeTag = tag.replace(Regex("[^A-Za-z0-9._-]"), "_")
+        return File(context.cacheDir, "$SELF_UPDATE_PREFIX$safeTag.apk")
+    }
+
+    /** True if the APK of this AAAI release was already downloaded. */
+    fun hasSelfUpdateDownloaded(tag: String): Boolean =
+        selfUpdateFile(tag).let { it.exists() && it.length() > 0 }
+
     /** Custom URL flow: download, verify it is really an APK, then prepare. */
     suspend fun installFromUrl(
         url: String,
         onProgress: (Int, String) -> Unit,
         onReadyToInstall: (File) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        autoMode: AutoMode = AutoMode.SIGN_ONLY
     ) = withContext(Dispatchers.IO) {
         val downloadedApk = File(context.cacheDir, "$CUSTOM_URL_KEY.apk")
         try {
@@ -148,7 +216,7 @@ class DownloadAndInstallService(private val context: Context) {
             }
 
             val apkToInstall = prepareForInstall(
-                downloadedApk, validation.packageName!!, CUSTOM_URL_KEY, onProgress
+                downloadedApk, validation.packageName!!, CUSTOM_URL_KEY, onProgress, autoMode
             )
             onProgress(95, "Ready to install")
             onReadyToInstall(apkToInstall)
@@ -168,7 +236,8 @@ class DownloadAndInstallService(private val context: Context) {
         uri: Uri,
         onProgress: (Int, String) -> Unit,
         onReadyToInstall: (File) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        autoMode: AutoMode = AutoMode.SIGN_ONLY
     ) = withContext(Dispatchers.IO) {
         val localApk = File(context.cacheDir, "$CUSTOM_FILE_KEY.apk")
         try {
@@ -189,7 +258,7 @@ class DownloadAndInstallService(private val context: Context) {
             }
 
             val apkToInstall = prepareForInstall(
-                localApk, validation.packageName!!, CUSTOM_FILE_KEY, onProgress
+                localApk, validation.packageName!!, CUSTOM_FILE_KEY, onProgress, autoMode
             )
             onProgress(95, "Ready to install")
             onReadyToInstall(apkToInstall)
@@ -210,8 +279,10 @@ class DownloadAndInstallService(private val context: Context) {
         sourceApk: File,
         originalPackage: String,
         key: String,
-        onProgress: (Int, String) -> Unit
+        onProgress: (Int, String) -> Unit,
+        autoMode: AutoMode = AutoMode.SIGN_ONLY
     ): File {
+        val autoApk = File(context.cacheDir, "${key}_auto.apk")
         val renamedApk = File(context.cacheDir, "${key}_renamed.apk")
         val stampedApk = File(context.cacheDir, "${key}_stamped.apk")
         val signedApk = File(context.cacheDir, "${key}_signed.apk")
@@ -219,8 +290,14 @@ class DownloadAndInstallService(private val context: Context) {
         try {
             // Rename package using ARSCLib (falls back to manifest byte replacement)
             onProgress(75, "Preparing APK...")
+            // Optional Android Auto conversion (GAME / NAVIGATION); SIGN_ONLY leaves the source untouched
+            val workApk = if (autoMode == AutoMode.SIGN_ONLY) sourceApk else {
+                onProgress(70, "Preparing for Android Auto (${autoMode.label})...")
+                AutoConverter.convert(context, sourceApk, autoApk, autoMode)
+                autoApk
+            }
             val newPkg = generateNewPackageName(originalPackage)
-            val renameOk = ApkPackageRenamer.renamePackage(context, sourceApk, renamedApk, originalPackage, newPkg)
+            val renameOk = ApkPackageRenamer.renamePackage(context, workApk, renamedApk, originalPackage, newPkg)
             val apkAfterRename = if (renameOk) {
                 val verifyPkg = try {
                     context.packageManager.getPackageArchiveInfo(renamedApk.absolutePath, 0)?.packageName ?: "unknown"
@@ -229,7 +306,7 @@ class DownloadAndInstallService(private val context: Context) {
                 renamedApk
             } else {
                 Log.w(TAG, "Rename failed — using original package")
-                sourceApk
+                workApk
             }
 
             // Play Store stamps (currently a copy stub, same as AAAD without apktool)
@@ -252,22 +329,16 @@ class DownloadAndInstallService(private val context: Context) {
         } finally {
             renamedApk.delete()
             stampedApk.delete()
+            autoApk.delete()
             // signedApk is kept until the system installs it
         }
     }
 
     private fun generateNewPackageName(original: String): String {
-        // Persist the renamed package to reuse on updates (avoids -103 duplicate permission error).
-        val prefs = context.getSharedPreferences("pkg_mappings", Context.MODE_PRIVATE)
-        val existingPkg = prefs.getString(original, null)
-        if (existingPkg != null) {
-            Log.d(TAG, "Reusing existing package mapping: $original → $existingPkg")
-            return existingPkg
-        }
-        val suffix = "aaai_" + java.util.UUID.randomUUID().toString().replace("-", "").take(6).lowercase()
-        val newPkg = "$original.$suffix"
-        prefs.edit().putString(original, newPkg).apply()
-        Log.d(TAG, "Generated new package mapping: $original → $newPkg")
+        // Reuses the renamed package already installed (fixed or old random name) so it updates in
+        // place (avoids -103 duplicate permission error); otherwise uses the fixed "<original>.aaai".
+        val newPkg = PackageNaming.nameForInstall(context, original)
+        Log.d(TAG, "Package name for install: $original → $newPkg")
         return newPkg
     }
 

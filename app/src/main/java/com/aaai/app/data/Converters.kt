@@ -5,13 +5,6 @@ import androidx.room.TypeConverter
 class Converters {
 
     @TypeConverter
-    fun fromAppCategory(value: AppCategory?): String? = value?.name
-
-    @TypeConverter
-    fun toAppCategory(value: String?): AppCategory? =
-        value?.let { AppCategory.fromString(it) }
-
-    @TypeConverter
     fun fromAppSourceType(value: AppSourceType?): String? = value?.name
 
     @TypeConverter

@@ -30,7 +30,10 @@ data class AppMetadata(
     /** Version that is installed on the device (GitHub tag for GITHUB_RELEASE apps). */
     val installedVersion: String? = null,
     val hasUpdate: Boolean = false,
-    val category: AppCategory,
+    /** Free text, shown exactly as written in apps_data.json (e.g. "UTILITIES-AUDIO"). */
+    val category: String,
     val githubRepo: String? = null,
+    /** Optional catalog "action": "g" = install as Android Auto game, "n" = navigation. Else normal install. */
+    val action: String? = null,
     val downloadState: DownloadState = DownloadState.IDLE
 )

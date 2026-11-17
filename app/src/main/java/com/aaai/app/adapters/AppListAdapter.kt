@@ -1,5 +1,6 @@
 package com.aaai.app.adapters
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +47,12 @@ class AppListAdapter(
         private val tvStatus: TextView = view.findViewById(R.id.tvStatus)
         private val btnAction: Button = view.findViewById(R.id.btnAction)
 
+        /** Blue shades so Install / Update / Open can be told apart at a glance. */
+        private fun styleButton(background: Int, text: Int) {
+            btnAction.backgroundTintList = ColorStateList.valueOf(background)
+            btnAction.setTextColor(text)
+        }
+
         fun bind(app: AppMetadata) {
             tvAppName.text = app.appName
             // FILE apps: catalog version. GITHUB_RELEASE apps: nothing before installing,
@@ -61,7 +68,7 @@ class AppListAdapter(
             } else {
                 tvVersion.visibility = View.GONE
             }
-            tvCategory.text = app.category.name
+            tvCategory.text = app.category
 
             val defaultIcon = android.R.drawable.sym_def_app_icon
             if (app.iconUrl.isNotEmpty()) {
@@ -96,9 +103,12 @@ class AppListAdapter(
                 tvStatus.text = if (app.hasUpdate) "Update available" else "Installed"
                 tvStatus.setTextColor(if (app.hasUpdate) 0xFFFF9800.toInt() else 0xFF4CAF50.toInt())
                 btnAction.text = if (app.hasUpdate) "Update" else "Open"
+                if (app.hasUpdate) styleButton(0xFF1E88E5.toInt(), 0xFFFFFFFF.toInt())   // Update: medium blue
+                else styleButton(0xFF90CAF9.toInt(), 0xFF0D1B2A.toInt())                  // Open: light blue
             } else {
                 tvStatus.visibility = View.GONE
                 btnAction.text = "Install"
+                styleButton(0xFF0D47A1.toInt(), 0xFFFFFFFF.toInt())                       // Install: dark blue
             }
 
             btnAction.setOnClickListener {

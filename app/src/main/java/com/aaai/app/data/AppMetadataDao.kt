@@ -18,7 +18,7 @@ interface AppMetadataDao {
     suspend fun getAllApps(): List<AppMetadata>
 
     @Query("SELECT * FROM app_metadata WHERE category = :category ORDER BY appName")
-    suspend fun getAppsByCategory(category: AppCategory): List<AppMetadata>
+    suspend fun getAppsByCategory(category: String): List<AppMetadata>
 
     @Query("SELECT * FROM app_metadata WHERE appId = :appId LIMIT 1")
     suspend fun getApp(appId: String): AppMetadata?

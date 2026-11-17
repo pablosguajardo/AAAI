@@ -10,6 +10,10 @@
         android:title="Show setup instructions"/>
 
     <item
+        android:id="@+id/check_update"
+        android:title="Check for updates"/>
+
+    <item
         android:id="@+id/version"
         android:title="v1.0"
         android:enabled="false" />

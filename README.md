@@ -58,6 +58,12 @@ AAAI is not distributed through the Google Play Store, so Android will ask for a
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_8.jpeg" alt="Screen_8" width="1024">
 
 
+## To do
+
+- **Keep apps updatable after reinstalling AAAI (feasibility study).** Apps installed through AAAI are signed with a key that AAAI generates on first use and stores in its private folder. If AAAI is uninstalled and installed again, that key is lost: the apps are still recognised as installed (their renamed package name is fixed), but Android refuses to update them because the signature differs, so they must be uninstalled first (their data is lost). Two options to evaluate:
+  - **Deterministic per-device key.** Derive the signing key from a device identifier (e.g. `ANDROID_ID`) plus a fixed salt, with a fixed certificate (serial number, validity dates and name), so the same key is regenerated after a reinstall. Points to check: `ANDROID_ID` changes with a factory reset and, on Android 8+, depends on the signing key of the app (debug vs release builds give different values); the salt cannot be secret because the project is open source, so the key is weaker than a random one; the key derivation must stay identical across BouncyCastle versions; apps already installed with the current random key would not benefit.
+  - **Include the keystore in Android's automatic backup** (as is already done for the install counter), so it can be restored on reinstall. Points to check: restoring is not guaranteed, especially for APKs installed manually, and it depends on the user having backup enabled.
+
 ## Advertising
 
 AAAI shows a small banner ad at the bottom of the main screen and, once in a while (every few installs), a full-screen ad so that development can continue. Ads are provided by [Start.io](https://www.start.io). Thank you for your support!
@@ -90,6 +96,13 @@ The apps listed in AAAI belong to their respective developers. Many of them are 
 - [RF Sentinel](https://github.com/CIS-C0/RFSentinel) – CIS-C0/RFSentinel
 - [Nuomi Player](https://github.com/charlottejas/NuomiPlayer) – charlottejas/NuomiPlayer
 - [Lumora Player](https://github.com/LumoraPlayer/Lumora) – LumoraPlayer/Lumora
+- [AA Mods](https://github.com/ImNoammm/aa-mods) – ImNoammm/aa-mods
+- [xFermaTube](https://github.com/juntulis/xFermaTube) – juntulis/xFermaTube
+- [Horizon Maps](https://github.com/benbishop028-arch/Horizon-Maps) – benbishop028-arch/Horizon-Maps
+- [Bit Chord](https://github.com/kushagrasinghx/BitChord) – kushagrasinghx/BitChord
+- [Fermata X](https://github.com/chuoinho/FermataX) – chuoinho/FermataX
+- [Dash Glance Clock](https://github.com/FilipNone/DashGlance-Clock) – FilipNone/DashGlance-Clock
+- [Calculator](https://github.com/FossifyOrg/Calculator) – FossifyOrg/Calculator
 
 
 This project is **not affiliated with, endorsed by, or sponsored by** any of them. Please check each project's repository for its own license and terms.

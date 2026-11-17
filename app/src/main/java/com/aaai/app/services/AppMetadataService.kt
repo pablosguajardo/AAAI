@@ -6,6 +6,7 @@ import androidx.core.content.pm.PackageInfoCompat
 import com.aaai.app.data.*
 import com.aaai.app.utils.InstalledVersionTracker
 import com.aaai.app.utils.NetworkErrors
+import com.aaai.app.utils.PackageNaming
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -109,8 +110,9 @@ class AppMetadataService(private val context: Context) {
                         isInstalled = false,
                         installedVersion = null,
                         hasUpdate = false,
-                        category = AppCategory.fromString(obj.optString("category")),
+                        category = obj.optString("category", "").trim().ifEmpty { "OTHER" },
                         githubRepo = obj.optString("githubRepo").takeIf { it.isNotEmpty() },
+                        action = obj.optString("action").trim().takeIf { it.isNotEmpty() },
                         downloadState = DownloadState.IDLE
                     )
                 )
@@ -127,14 +129,14 @@ class AppMetadataService(private val context: Context) {
     suspend fun getAllApps(): List<AppMetadata> = withContext(Dispatchers.IO) {
         // Sorted by category (A-Z), then by app name (A-Z, case-insensitive)
         dao.getAllApps().sortedWith(
-            compareBy<AppMetadata>({ it.category.name.lowercase() }, { it.appName.lowercase() })
+            compareBy<AppMetadata>({ it.category.lowercase() }, { it.appName.lowercase() })
         )
     }
 
     /**
      * Obtiene apps por categoría.
      */
-    suspend fun getAppsByCategory(category: AppCategory): List<AppMetadata> =
+    suspend fun getAppsByCategory(category: String): List<AppMetadata> =
         withContext(Dispatchers.IO) {
             dao.getAppsByCategory(category)
         }
@@ -151,21 +153,10 @@ class AppMetadataService(private val context: Context) {
      * Las apps se instalan con un package renombrado (guardado en "pkg_mappings"), por lo que
      * primero se busca ese y, como respaldo, el package original.
      */
-    fun resolveInstalledPackage(originalPackage: String): String? {
-        val pm = context.packageManager
-        val prefs = context.getSharedPreferences("pkg_mappings", Context.MODE_PRIVATE)
-        val renamed = prefs.getString(originalPackage, null)
-        val candidates = listOfNotNull(renamed, originalPackage).distinct()
-        for (pkg in candidates) {
-            try {
-                pm.getPackageInfo(pkg, 0)
-                return pkg
-            } catch (e: Exception) {
-                // no instalado con este nombre
-            }
-        }
-        return null
-    }
+    fun resolveInstalledPackage(
+        originalPackage: String,
+        installed: Set<String> = PackageNaming.installedPackageNames(context)
+    ): String? = PackageNaming.resolveInstalled(context, originalPackage, installed)
 
     /**
      * Actualiza los estados de instalación comparando con las apps instaladas en el dispositivo.
@@ -174,12 +165,13 @@ class AppMetadataService(private val context: Context) {
         try {
             val packageManager = context.packageManager
             val apps = dao.getAllApps()
+            // One scan of the installed packages for the whole list
+            val installedNames = PackageNaming.installedPackageNames(context)
             for (app in apps) {
                 try {
-                    val installedPackage = resolveInstalledPackage(app.packageName)
+                    val installedPackage = resolveInstalledPackage(app.packageName, installedNames)
                         ?: throw IllegalStateException("not installed")
                     val packageInfo = packageManager.getPackageInfo(installedPackage, 0)
-                    val installedVersionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt()
                     val isInstalled = true
                     val isGithub = app.isGithubRelease()
                     val hasUpdate: Boolean
@@ -192,8 +184,16 @@ class AppMetadataService(private val context: Context) {
                         hasUpdate = installedTag != null && latestTag != null && installedTag != latestTag
                         shownVersion = installedTag ?: packageInfo.versionName
                     } else {
-                        hasUpdate = app.versionCode > installedVersionCode
-                        shownVersion = packageInfo.versionName
+                        // FILE apps: compare the catalog "version" with the version recorded at install time.
+                        // (The real APK versionCode is not comparable: the catalog value may differ from it.)
+                        InstalledVersionTracker.confirmPendingIfInstalled(context, app.appId, packageInfo.lastUpdateTime)
+                        if (app.version.isNotEmpty()) {
+                            InstalledVersionTracker.ensureBaseline(context, app.appId, app.version)
+                        }
+                        val installedVersion = InstalledVersionTracker.getInstalledTag(context, app.appId)
+                        hasUpdate = app.version.isNotEmpty() && installedVersion != null &&
+                                UpdateChecker.compareVersions(app.version, installedVersion) > 0
+                        shownVersion = installedVersion ?: packageInfo.versionName
                     }
                     dao.updateInstallationStatus(app.packageName, isInstalled, shownVersion)
                     dao.updateHasUpdate(app.packageName, hasUpdate)

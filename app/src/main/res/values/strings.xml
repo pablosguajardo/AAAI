@@ -3,7 +3,7 @@
     <string name="app_name" translatable="false">AA Apps Installer</string>
 
     <!-- About screen -->
-    <string name="title_activity_about_payment">About AAAI</string>
+    <string name="title_activity_about">About AAAI</string>
     <!-- TODO: point this to the new repository once it is created -->
     <string name="project_url" translatable="false">https://github.com/pablosguajardo/AAAI</string>
     <string name="about_intro">AAAI (Android Auto Apps Installer) is a utility to download and install custom apps for Android Auto on non-rooted phones.</string>
