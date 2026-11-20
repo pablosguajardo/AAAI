@@ -56,6 +56,49 @@ object InstalledVersionTracker {
         p.edit().putString("installed_$appId", version).apply()
     }
 
+    /** Records [tag] as installed unless a version is already known (used to recover after reinstalling AAAI). */
+    fun recoverInstalled(ctx: Context, appId: String, tag: String) {
+        val p = prefs(ctx)
+        if (p.getString("installed_$appId", null) != null) return
+        if (p.getString("pending_tag_$appId", null) != null) return
+        p.edit().putString("installed_$appId", tag).apply()
+    }
+
+    /** Drops everything saved for an app that was removed from the catalog. */
+    fun forget(ctx: Context, appId: String) {
+        prefs(ctx).edit()
+            .remove("installed_$appId")
+            .remove("latest_$appId")
+            .remove("pending_tag_$appId")
+            .remove("pending_time_$appId")
+            .apply()
+    }
+
+    /**
+     * Directly marks a version as installed (used when RESULT_OK is received from the system
+     * installer, which is reliable). Also clears any pending entry for this app.
+     */
+    fun forceInstalled(ctx: Context, appId: String, tag: String) {
+        prefs(ctx).edit()
+            .putString("installed_$appId", tag)
+            .remove("pending_tag_$appId")
+            .remove("pending_time_$appId")
+            .apply()
+    }
+
+    /**
+     * Returns the pending tag if it was set within the last 5 minutes (recently installed but not
+     * yet confirmed by a package scan). Used for display purposes to show hasUpdate correctly
+     * right after an install completes.
+     */
+    fun getPendingTagForDisplay(ctx: Context, appId: String): String? {
+        val p = prefs(ctx)
+        val tag = p.getString("pending_tag_$appId", null) ?: return null
+        val started = p.getLong("pending_time_$appId", 0L)
+        val fiveMin = 5L * 60 * 1000
+        return if (System.currentTimeMillis() - started < fiveMin) tag else null
+    }
+
     /** Called when the app is no longer installed. */
     fun clearInstalled(ctx: Context, appId: String) {
         prefs(ctx).edit().remove("installed_$appId").apply()

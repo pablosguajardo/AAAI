@@ -5,6 +5,7 @@ import android.os.Build
 import android.util.Log
 import com.aaai.app.utils.HttpStatusException
 import com.aaai.app.utils.NetworkErrors
+import com.aaai.app.utils.VersionCompare
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -198,7 +199,20 @@ class GitHubReleaseService(private val context: Context) {
             )
         }
         Log.d(TAG, "Parsed ${result.size} releases with APKs")
-        return result.sortedByDescending { it.publishedAt }.take(MAX_RELEASES)
+        return sortNewestFirst(result).take(MAX_RELEASES)
+    }
+
+    /**
+     * Newest first. When every tag carries a number ("v0.3", "0.0.5") the highest version wins, because some repos
+     * publish releases out of order; otherwise (tags like "nightly") the publication date decides.
+     */
+    private fun sortNewestFirst(releases: List<Release>): List<Release> {
+        if (releases.any { !VersionCompare.hasNumber(it.tag) }) return releases.sortedByDescending { it.publishedAt }
+        // SemVer precedence decides; publication date only breaks ties
+        return releases.sortedWith(Comparator { a, b ->
+            val c = VersionCompare.compare(b.tag, a.tag) ?: 0
+            if (c != 0) c else b.publishedAt.compareTo(a.publishedAt)
+        })
     }
 
     private fun parseDate(value: String): Long {

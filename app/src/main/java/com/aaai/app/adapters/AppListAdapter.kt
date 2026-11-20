@@ -100,9 +100,17 @@ class AppListAdapter(
 
             if (app.isInstalled) {
                 tvStatus.visibility = View.VISIBLE
-                tvStatus.text = if (app.hasUpdate) "Update available" else "Installed"
+                tvStatus.text = when {
+                    app.hasUpdate && app.signatureMismatch -> "Update available (different signing key)"
+                    app.hasUpdate -> "Update available"
+                    else -> "Installed"
+                }
                 tvStatus.setTextColor(if (app.hasUpdate) 0xFFFF9800.toInt() else 0xFF4CAF50.toInt())
-                btnAction.text = if (app.hasUpdate) "Update" else "Open"
+                btnAction.text = when {
+                    app.hasUpdate && app.signatureMismatch -> "Reinstall"
+                    app.hasUpdate -> "Update"
+                    else -> "Open"
+                }
                 if (app.hasUpdate) styleButton(0xFF1E88E5.toInt(), 0xFFFFFFFF.toInt())   // Update: medium blue
                 else styleButton(0xFF90CAF9.toInt(), 0xFF0D1B2A.toInt())                  // Open: light blue
             } else {

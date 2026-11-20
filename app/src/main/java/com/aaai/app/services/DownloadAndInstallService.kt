@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.core.content.FileProvider
 import com.aaai.app.autoconv.AutoConverter
 import com.aaai.app.autoconv.AutoMode
+import com.aaai.app.autoconv.NoWebContentException
 import com.aaai.app.data.AppMetadata
 import com.aaai.app.utils.ApkPackageRenamer
 import com.aaai.app.utils.ApkSignerV2
@@ -39,8 +40,8 @@ class DownloadAndInstallService(private val context: Context) {
          */
         const val FORCE_REDOWNLOAD = false
 
-        private const val CUSTOM_URL_KEY = "custom_url"
-        private const val CUSTOM_FILE_KEY = "custom_file"
+        const val CUSTOM_URL_KEY = "custom_url"
+        const val CUSTOM_FILE_KEY = "custom_file"
         private const val SELF_UPDATE_PREFIX = "aaai_self_update_"
     }
 
@@ -73,12 +74,16 @@ class DownloadAndInstallService(private val context: Context) {
             }
 
             val apkToInstall = prepareForInstall(
-                downloadedApk, app.packageName, app.appId, onProgress, AutoMode.fromAction(app.action)
+                downloadedApk, app.packageName, app.appId, onProgress, AutoMode.fromAction(app.action), app.carUrl,
+                app.version.ifEmpty { null }
             )
             // FILE apps: remember the catalog version being installed (confirmed once the package is updated)
             if (app.version.isNotEmpty()) InstalledVersionTracker.setPending(context, app.appId, app.version)
             onProgress(95, "Ready to install")
             onReadyToInstall(apkToInstall)
+        } catch (e: NoWebContentException) {
+            Log.w(TAG, "WebView mode: no web content in ${app.appName}")
+            onError("${app.appName}: ${e.message}")
         } catch (e: Exception) {
             Log.e(TAG, "Download/install error", e)
             onError("Could not download ${app.appName}. ${NetworkErrors.describe(e)}")
@@ -93,7 +98,8 @@ class DownloadAndInstallService(private val context: Context) {
         assetUrl: String,
         onProgress: (Int, String) -> Unit,
         onReadyToInstall: (File) -> Unit,
-        onError: (String) -> Unit
+        onError: (String) -> Unit,
+        skipRename: Boolean = false
     ) = withContext(Dispatchers.IO) {
         val safeTag = tag.replace(Regex("[^A-Za-z0-9._-]"), "_")
         val downloadedApk = File(context.cacheDir, "${app.appId}_gh_$safeTag.apk")
@@ -117,12 +123,16 @@ class DownloadAndInstallService(private val context: Context) {
             }
 
             val apkToInstall = prepareForInstall(
-                downloadedApk, app.packageName, app.appId, onProgress, AutoMode.fromAction(app.action)
+                downloadedApk, app.packageName, app.appId, onProgress, AutoMode.fromAction(app.action), app.carUrl,
+                tag, skipRename = skipRename
             )
             // Remember which version is being installed; confirmed once the package is updated
             InstalledVersionTracker.setPending(context, app.appId, tag)
             onProgress(95, "Ready to install")
             onReadyToInstall(apkToInstall)
+        } catch (e: NoWebContentException) {
+            Log.w(TAG, "WebView mode: no web content in ${app.appName}")
+            onError("${app.appName}: ${e.message}")
         } catch (e: Exception) {
             Log.e(TAG, "GitHub release install error", e)
             onError("Could not download ${app.appName} $tag. ${NetworkErrors.describe(e)}")
@@ -192,7 +202,8 @@ class DownloadAndInstallService(private val context: Context) {
         onProgress: (Int, String) -> Unit,
         onReadyToInstall: (File) -> Unit,
         onError: (String) -> Unit,
-        autoMode: AutoMode = AutoMode.SIGN_ONLY
+        autoMode: AutoMode = AutoMode.SIGN_ONLY,
+        skipRename: Boolean = false
     ) = withContext(Dispatchers.IO) {
         val downloadedApk = File(context.cacheDir, "$CUSTOM_URL_KEY.apk")
         try {
@@ -216,10 +227,13 @@ class DownloadAndInstallService(private val context: Context) {
             }
 
             val apkToInstall = prepareForInstall(
-                downloadedApk, validation.packageName!!, CUSTOM_URL_KEY, onProgress, autoMode
+                downloadedApk, validation.packageName!!, CUSTOM_URL_KEY, onProgress, autoMode,
+                skipRename = skipRename
             )
             onProgress(95, "Ready to install")
             onReadyToInstall(apkToInstall)
+        } catch (e: NoWebContentException) {
+            onError(e.message ?: "No WebView content found")
         } catch (e: IllegalArgumentException) {
             Log.e(TAG, "Invalid URL", e)
             onError("Invalid URL: ${e.message}")
@@ -237,7 +251,8 @@ class DownloadAndInstallService(private val context: Context) {
         onProgress: (Int, String) -> Unit,
         onReadyToInstall: (File) -> Unit,
         onError: (String) -> Unit,
-        autoMode: AutoMode = AutoMode.SIGN_ONLY
+        autoMode: AutoMode = AutoMode.SIGN_ONLY,
+        skipRename: Boolean = false
     ) = withContext(Dispatchers.IO) {
         val localApk = File(context.cacheDir, "$CUSTOM_FILE_KEY.apk")
         try {
@@ -258,10 +273,13 @@ class DownloadAndInstallService(private val context: Context) {
             }
 
             val apkToInstall = prepareForInstall(
-                localApk, validation.packageName!!, CUSTOM_FILE_KEY, onProgress, autoMode
+                localApk, validation.packageName!!, CUSTOM_FILE_KEY, onProgress, autoMode,
+                skipRename = skipRename
             )
             onProgress(95, "Ready to install")
             onReadyToInstall(apkToInstall)
+        } catch (e: NoWebContentException) {
+            onError(e.message ?: "No WebView content found")
         } catch (e: Exception) {
             Log.e(TAG, "Local file install error", e)
             onError("Error: ${e.message}")
@@ -280,7 +298,10 @@ class DownloadAndInstallService(private val context: Context) {
         originalPackage: String,
         key: String,
         onProgress: (Int, String) -> Unit,
-        autoMode: AutoMode = AutoMode.SIGN_ONLY
+        autoMode: AutoMode = AutoMode.SIGN_ONLY,
+        webUrl: String? = null,
+        catalogVersion: String? = null,
+        skipRename: Boolean = false
     ): File {
         val autoApk = File(context.cacheDir, "${key}_auto.apk")
         val renamedApk = File(context.cacheDir, "${key}_renamed.apk")
@@ -293,20 +314,27 @@ class DownloadAndInstallService(private val context: Context) {
             // Optional Android Auto conversion (GAME / NAVIGATION); SIGN_ONLY leaves the source untouched
             val workApk = if (autoMode == AutoMode.SIGN_ONLY) sourceApk else {
                 onProgress(70, "Preparing for Android Auto (${autoMode.label})...")
-                AutoConverter.convert(context, sourceApk, autoApk, autoMode)
+                AutoConverter.convert(context, sourceApk, autoApk, autoMode, webUrl)
                 autoApk
             }
-            val newPkg = generateNewPackageName(originalPackage)
-            val renameOk = ApkPackageRenamer.renamePackage(context, workApk, renamedApk, originalPackage, newPkg)
-            val apkAfterRename = if (renameOk) {
-                val verifyPkg = try {
-                    context.packageManager.getPackageArchiveInfo(renamedApk.absolutePath, 0)?.packageName ?: "unknown"
-                } catch (e: Exception) { "error: ${e.message}" }
-                Log.d(TAG, "Package renamed: $originalPackage -> $newPkg (actual: $verifyPkg)")
-                renamedApk
-            } else {
-                Log.w(TAG, "Rename failed — using original package")
+            val apkAfterRename = if (skipRename) {
+                Log.d(TAG, "Package rename skipped by user request")
                 workApk
+            } else {
+                val newPkg = generateNewPackageName(originalPackage)
+                val renameOk = ApkPackageRenamer.renamePackage(
+                    context, workApk, renamedApk, originalPackage, newPkg, catalogVersion
+                )
+                if (renameOk) {
+                    val verifyPkg = try {
+                        context.packageManager.getPackageArchiveInfo(renamedApk.absolutePath, 0)?.packageName ?: "unknown"
+                    } catch (e: Exception) { "error: ${e.message}" }
+                    Log.d(TAG, "Package renamed: $originalPackage -> $newPkg (actual: $verifyPkg)")
+                    renamedApk
+                } else {
+                    Log.w(TAG, "Rename failed — using original package")
+                    workApk
+                }
             }
 
             // Play Store stamps (currently a copy stub, same as AAAD without apktool)

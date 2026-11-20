@@ -41,6 +41,9 @@ interface AppMetadataDao {
     @Query("UPDATE app_metadata SET hasUpdate = :hasUpdate WHERE packageName = :packageName")
     suspend fun updateHasUpdate(packageName: String, hasUpdate: Boolean)
 
+    @Query("UPDATE app_metadata SET signatureMismatch = :mismatch WHERE packageName = :packageName")
+    suspend fun updateSignatureMismatch(packageName: String, mismatch: Boolean)
+
     @Query("UPDATE app_metadata SET downloadState = :downloadState WHERE appId = :appId")
     suspend fun updateDownloadState(appId: String, downloadState: DownloadState)
 

@@ -58,6 +58,14 @@
             android:exported="false"
             android:theme="@style/Theme.AA_Apps_Downloader" />
 
+        <!-- GitHub repo search screen -->
+        <activity
+            android:name=".GithubSearchActivity"
+            android:screenOrientation="portrait"
+            android:exported="false"
+            android:label="Search App on GitHub"
+            android:theme="@style/Theme.AA_Apps_Downloader" />
+
         <!-- About / Info screen (kept for menu item) -->
         <activity
             android:name=".AboutActivity"

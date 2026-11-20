@@ -1,6 +1,160 @@
 {
     "app_metadata": [
-        
+        {
+            "appId": "CarStream2.0.5",
+            "appName": "CarStream 2.0.5",
+            "packageName": "maps.jaoolonda.android",
+            "description": "Formerly known as \"YouTube Auto\", CarStream was one of the first apps built with the custom apps SDK. It was created mainly to bring YouTube to Android Auto and later grew into a web browser with many possibilities.",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/CarStream2.0.5.png",
+            "sourceType": "FILE",
+            "category": "MULTIMEDIA",
+            "version": "2.0.5",
+            "versionCode": 205,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/Carstream2.0.5.apk"
+        },
+        {
+            "appId": "CarStream2.0.4",
+            "appName": "CarStream 2.0.4",
+            "packageName": "maps.jaoolonda.android",
+            "description": "Formerly known as \"YouTube Auto\", CarStream was one of the first apps built with the custom apps SDK. It was created mainly to bring YouTube to Android Auto and later grew into a web browser with many possibilities.",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/CarStream2.0.4.png",
+            "sourceType": "FILE",
+            "category": "MULTIMEDIA",
+            "version": "2.0.4",
+            "versionCode": 204,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/Carstream2.0.4.apk"
+        },
+        {
+            "appId": "CarStream2.0.2",
+            "appName": "CarStream 2.0.2",
+            "packageName": "maps.jaoolonda.android",
+            "description": "Formerly known as \"YouTube Auto\", CarStream was one of the first apps built with the custom apps SDK. It was created mainly to bring YouTube to Android Auto and later grew into a web browser with many possibilities.",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/CarStream2.0.2.png",
+            "sourceType": "FILE",
+            "category": "MULTIMEDIA",
+            "version": "2.0.2",
+            "versionCode": 202,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/Carstream2.0.2.apk"
+        },
+        {
+            "appId": "ipcartv",
+            "appName": "Ip Car Tv",
+            "packageName": "com.ipcartv.android",
+            "description": "Ip Car Tv 0.3.1.2",
+            "iconUrl": "",
+            "sourceType": "FILE",
+            "category": "MULTIMEDIA",
+            "version": "0.3.1.2",
+            "versionCode": 312,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/ipcartv.0.3.1.2.apk"
+        },
+        {
+            "appId": "",
+            "appName": "Performance Monitor base",
+            "packageName": "com.Performance.Monitor",
+            "description": "Performance Monitor 0.1.0",
+            "iconUrl": "",
+            "sourceType": "FILE",
+            "category": "MULTIMEDIA",
+            "version": "0.1.0",
+            "versionCode": 10,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/Performance_Monitor_base.apk"
+        },
+        {
+            "appId": "local_video_player",
+            "appName": "Local Video Player",
+            "packageName": "com.local.video",
+            "description": "Local Video Player 0.3.1.3",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/local_video_player.0.3.1.3.png",
+            "sourceType": "FILE",
+            "category": "MULTIMEDIA",
+            "version": "0.1.0",
+            "versionCode": 10,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/local_video_player.0.3.1.3.apk"
+        },
+		{
+            "appId": "",
+            "appName": "Tetris 3D",
+            "packageName": "ar.com.solucionespsg.cubos3d",
+            "description": "Tetris 3D 3.0.2",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/cubos3d3.0.2.png",
+            "sourceType": "FILE",
+            "category": "GAMES",
+            "version": "3.0.2",
+            "versionCode": 302,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/cubos3d3.0.2.apk"
+        },
+		{
+            "appId": "SpaceInvaders",
+            "appName": "Space Invaders",
+            "packageName": "ar.com.solucionespsg.invaders8bits",
+            "description": "Space Invaders 1.2.2",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/Space-Invaders1.2.2.png",
+            "sourceType": "FILE",
+            "category": "GAMES",
+            "version": "1.2.2",
+            "versionCode": 122,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/Space-Invaders1.2.2.apk",
+			"action" : "g"
+        },
+		{
+            "appId": "",
+            "appName": "NO anda multi touch Ghost Of Pehuajó",
+            "packageName": "ar.com.solucionespsg.GhostOfPehuajo",
+            "description": "Ghost Of Pehuajo 0.2.1",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/GhostOfPehuajo-0.2.1.png",
+            "sourceType": "FILE",
+            "category": "GAMES",
+            "version": "0.2.1",
+            "versionCode": 21,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/GhostOfPehuajo-0.2.1.apk",
+			"action" : "g"
+        },
+		{
+            "appId": "",
+            "appName": "se ve mal Puzzle Master",
+            "packageName": "ar.com.solucionespsg.puzzlemaster",
+            "description": "Puzzle Master 1.1.7",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/puzzlemaster-1.1.7.png",
+            "sourceType": "FILE",
+            "category": "GAMES",
+            "version": "1.1.7",
+            "versionCode": 117,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/puzzlemaster-1.1.7.apk",
+			"action" : "g"
+        },
+		{
+            "appId": "",
+            "appName": "se ve mal Infinite PacMan",
+            "packageName": "ar.com.solucionespsg.InfinitePacMan",
+            "description": "Infinite PacMan 0.2",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/InfinitePacMan-0.2.png",
+            "sourceType": "FILE",
+            "category": "GAMES",
+            "version": "0.2",
+            "versionCode": 2,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/InfinitePacMan-0.2.apk",
+			"action" : "g"
+        },
+		{
+            "appId": "trucoscoring",
+            "appName": "Anotador de Truco",
+            "packageName": "ar.com.solucionespsg.trucoscoring",
+            "description": "Anotador de Truco 0.2",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/trucoscoring-0.2.png",
+            "sourceType": "FILE",
+            "category": "GAMES",
+            "version": "0.2",
+            "versionCode": 2,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/trucoscoring-0.2.apk",
+			"action" : "g"
+        },
+		
+		
+		
+		
+		
+		
         {
             "appId": "CarStream",
             "appName": "CarStream",
@@ -10,6 +164,284 @@
             "category": "MULTIMEDIA",
             "githubRepo": "thekirankumar/carstream-android-auto"
         },
+        {
+            "appId": "yt-auto",
+            "appName": "YT Auto",
+            "packageName": "dev.begati.youtubeauto",
+            "iconUrl": "",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "begati/yt-auto"
+        },
+        {
+            "appId": "",
+            "appName": "AAGearUP",
+            "packageName": "dev.lsprobe.AAGearUP",
+            "iconUrl": "",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "lsprobe/AAGearUP"
+        },
+        {
+            "appId": "7x-Lyrics",
+            "appName": "7x Lyrics",
+            "packageName": "com.aalyrics.view",
+            "iconUrl": "https://raw.githubusercontent.com/c9hama/7x-Lyrics/refs/heads/main/fastlane/metadata/android/en-US/images/icon.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "c9hama/7x-Lyrics"
+        },
+        {
+            "appId": "",
+            "appName": "AAMotoMic AA Moto Mic",
+            "packageName": "com.moster67.AAMotoMic",
+            "iconUrl": "",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "moster67/AAMotoMic"
+        },
+        {
+            "appId": "RadioDroid",
+            "appName": "RadioDroid",
+            "packageName": "net.programmierecke.radiodroid2",
+            "iconUrl": "https://raw.githubusercontent.com/morckx/RadioDroid/refs/heads/master/google/icon.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES-AUDIO",
+            "githubRepo": "morckx/RadioDroid"
+        },
+        {
+            "appId": "youtube-companion",
+            "appName": "YouTube Companion",
+            "packageName": "de.uni.youtubeaa",
+            "iconUrl": "https://raw.githubusercontent.com/seinist/youtube-companion/refs/heads/main/car/src/main/res/drawable-xxxhdpi/ic_brand_play.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "seinist/youtube-companion"
+        },
+        {
+            "appId": "aabrowserIt",
+            "appName": "AA Browser CarWeb",
+            "packageName": "com.fcaronte.aabrowser",
+            "description": "Browse the web on Android Auto.",
+            "iconUrl": "https://raw.githubusercontent.com/fcaronte/AABrowser/refs/heads/main/browser/src/main/ic_launcher-playstore.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "fcaronte/AABrowser"
+        },
+        {
+            "appId": "Fermata-Xtream",
+            "appName": "Fermata-Xtream",
+            "packageName": "me.aap.fermatamod.dear.google.why.bingo5",
+            "description": "Get out of Android Auto without leaving the car.",
+            "iconUrl": "https://avatars.githubusercontent.com/u/23300461?s=60&v=4",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "malebuffy/Fermata-Xtream"
+        },
+        {
+            "appId": "Meld",
+            "appName": "Meld",
+            "packageName": "com.metrolist.music",
+            "iconUrl": "https://raw.githubusercontent.com/FrancescoGrazioso/Meld/refs/heads/main/app/src/main/ic_launcher-playstore.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MUSIC",
+            "githubRepo": "FrancescoGrazioso/Meld"
+        },
+        {
+            "appId": "Metrolist",
+            "appName": "Metrolist",
+            "packageName": "com.metrolist.music2",
+            "iconUrl": "https://raw.githubusercontent.com/MetrolistGroup/Metrolist/refs/heads/main/assets/ic_launcher-playstore.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MUSIC",
+            "githubRepo": "MetrolistGroup/Metrolist"
+        },
+        {
+            "appId": "SpotiDuck",
+            "appName": "SpotiDuck",
+            "packageName": "net.SpotiDuck.Releases",
+            "iconUrl": "https://raw.githubusercontent.com/23fpsz/SpotiDuck-Releases/refs/heads/main/SpotiDuck.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MUSIC",
+            "githubRepo": "23fpsz/SpotiDuck-Releases"
+        },
+        {
+            "appId": "Vela Maps",
+            "appName": "Vela Maps",
+            "packageName": "app.vela",
+            "iconUrl": "https://raw.githubusercontent.com/PimpinPumpkin/Vela/refs/heads/main/fdroid/icon.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES-MAPS",
+            "githubRepo": "PimpinPumpkin/Vela"
+        },
+        {
+            "appId": "RF Sentinel",
+            "appName": "RF Sentinel",
+            "packageName": "com.rfsentinel.app",
+            "iconUrl": "https://raw.githubusercontent.com/CIS-C0/RFSentinel/refs/heads/main/fastlane/metadata/android/en-US/images/icon.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES-MAPS",
+            "githubRepo": "CIS-C0/RFSentinel"
+        },
+        {
+            "appId": "NuomiPlayer",
+            "appName": "Nuomi Player",
+            "packageName": "com.example.myapplication",
+            "description": "",
+            "iconUrl": "https://github.com/charlottejas/NuomiPlayer/blob/main/docs/icon.png?raw=true",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "charlottejas/NuomiPlayer"
+        },
+        {
+            "appId": "Lumora",
+            "appName": "Lumora Player",
+            "packageName": "com.lumora",
+            "description": "",
+            "iconUrl": "https://raw.githubusercontent.com/LumoraPlayer/Lumora/refs/heads/main/app/src/main/res/mipmap-hdpi/ic_launcher_round.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "LumoraPlayer/Lumora"
+        },	
+        {
+            "appId": "",
+            "appName": "is trial 20 minutes only Velvet Launcher ",
+            "packageName": "com.Velvet.Launcher",
+            "description": "Browse the web on Android Auto.",
+            "iconUrl": "https://avatars.githubusercontent.com/u/23300461?s=60&v=4",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "malebuffy/VelvetLauncher"
+        },
+        {
+            "appId": "aa-mods",
+            "appName": "AA Mods",
+            "packageName": "uk.noammm.aamod",
+            "description": "",
+            "iconUrl": "https://raw.githubusercontent.com/ImNoammm/aa-mods/main/.github/icon.svg",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "ImNoammm/aa-mods"
+        },
+        {
+            "appId": "xFermaTube",
+            "appName": "xFermaTube",
+            "packageName": "me.app.fermataX",
+            "description": "",
+            "iconUrl": "https://raw.githubusercontent.com/juntulis/xFermaTube/main/docs/icon.svg",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "juntulis/xFermaTube"
+        },
+        {
+            "appId": "",
+            "appName": "not work XtreamPlayerFree",
+            "packageName": "x.tream.PlayerFree",
+            "description": "",
+            "iconUrl": "https://avatars.githubusercontent.com/u/23300461?s=60&v=4",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "malebuffy/XtreamPlayerFree"
+        },
+        {
+            "appId": "Horizon-Maps",
+            "appName": "Horizon Maps",
+            "packageName": "com.headunit.nav",
+            "description": "",
+            "iconUrl": "https://avatars.githubusercontent.com/u/255750941?s=60&v=4",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES-MAPS",
+            "githubRepo": "benbishop028-arch/Horizon-Maps"
+        },
+        {
+            "appId": "BitChord",
+            "appName": "Bit Chord",
+            "packageName": "com.music.bitchord",
+            "iconUrl": "https://raw.githubusercontent.com/kushagrasinghx/BitChord/refs/heads/main/web/extension/public/icon/128.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MUSIC",
+            "githubRepo": "kushagrasinghx/BitChord"
+        },
+        {
+            "appId": "",
+            "appName": "RetroDriveAA",
+            "packageName": "com.codeodyssey.retrodriveaa",
+            "description": "",
+            "iconUrl": "https://raw.githubusercontent.com/malebuffy/RetroDriveAA/refs/heads/main/app/src/main/ic_launcher-playstore.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "GAMES",
+            "githubRepo": "malebuffy/RetroDriveAA"
+        },
+        {
+            "appId": "",
+            "appName": "nada.... GameNative Android Auto",
+            "packageName": "app.gamenative",
+            "description": "",
+            "iconUrl": "https://raw.githubusercontent.com/malebuffy/GameNative-AndroidAuto/refs/heads/master/app/src/main/ic_launcher-playstore.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "GAMES",
+            "githubRepo": "malebuffy/GameNative-AndroidAuto"
+        },
+        {
+            "appId": "",
+            "appName": "No hace nada?? Equalizer 314",
+            "packageName": "com.bearinmind.equalizer314",
+            "description": "",
+            "iconUrl": "https://raw.githubusercontent.com/bearinmindcat/Equalizer314/refs/heads/main/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES-AUDIO",
+            "githubRepo": "bearinmindcat/Equalizer314",
+			"action" : "g"
+        },
+		{
+            "appId": "fermatax",
+            "appName": "Fermata X",
+            "packageName": "me.app.fermataX2",
+            "description": "Get out of Android Auto without leaving the car.",
+            "iconUrl": "https://raw.githubusercontent.com/chuoinho/FermataX/refs/heads/main/extracted_logo/fermatax_app_logo.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "MULTIMEDIA",
+            "githubRepo": "chuoinho/FermataX"
+        },
+        {
+            "appId": "DashGlance-Clock",
+            "appName": "Dash Glance Clock",
+            "packageName": "com.filipnone.dashglanceclock",
+            "description": "",
+            "iconUrl": "https://raw.githubusercontent.com/FilipNone/DashGlance-Clock/refs/heads/main/app/src/main/ic_launcher-playstore.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "FilipNone/DashGlance-Clock"
+        },
+        {
+            "appId": "Calculator",
+            "appName": "Calculator",
+            "packageName": "org.fossify.math",
+            "description": "",
+            "iconUrl": "https://raw.githubusercontent.com/FossifyOrg/Calculator/refs/heads/main/app/src/main/ic_launcher-playstore.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "FossifyOrg/Calculator",
+			"action" : "g"
+        },
+        {
+            "appId": "",
+            "appName": "no funciona Speedtest",
+            "packageName": "com.khalidwar.demo.speedtest",
+            "description": "",
+            "iconUrl": "https://raw.githubusercontent.com/KhalidWar/speedtest_app/refs/heads/master/android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+            "sourceType": "GITHUB_RELEASE",
+            "category": "UTILITIES",
+            "githubRepo": "KhalidWar/speedtest_app",
+			"action" : "g"
+        },
+		
+		
+		
+		
+		
+
+		
         {
             "appId": "fermata",
             "appName": "Fermata Auto",
@@ -28,6 +460,54 @@
             "sourceType": "GITHUB_RELEASE",
             "category": "MIRRORING",
             "githubRepo": "slzn/ScreenOnAuto-releases"
+        },
+        {
+            "appId": "Screen2Auto",
+            "appName": "Screen2Auto",
+            "packageName": "android.loandamaps.it",
+            "description": "The most complete and feature-rich mirroring app for Android Auto. Includes many features such as a customizable launcher, split screen, custom screen sizes and much more!",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/Screen2Auto3.7.png",
+            "sourceType": "FILE",
+            "category": "MIRRORING",
+            "version": "3.7",
+            "versionCode": 1,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/Screen2Auto3.7.apk"
+        },
+        {
+            "appId": "aamirror",
+            "appName": "AA Mirror",
+            "packageName": "maps.kiao2client.android",
+            "description": "Mirrors your smartphone screen on Android Auto.",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/aamirror1.0.png",
+            "sourceType": "FILE",
+            "category": "MIRRORING",
+            "version": "1.0",
+            "versionCode": 1,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/aamirror1.0.apk"
+        },
+        {
+            "appId": "aastream",
+            "appName": "AAStream",
+            "packageName": "maps.mobilejiohubclient.android",
+            "description": "Streams videos on Android Auto.",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/aa-stream1.1.0.29.png",
+            "sourceType": "FILE",
+            "category": "MIRRORING",
+            "version": "1.1.0.29",
+            "versionCode": 29,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/aa-stream1.1.0.29.apk"
+        },
+        {
+            "appId": "aamp",
+            "appName": "AA Mirror Plus",
+            "packageName": "maps.mobilejiohub.android",
+            "description": "An alternative to AA Mirror with some extra features.",
+            "iconUrl": "https://raw.githubusercontent.com/pablosguajardo/AAApps/refs/heads/master/AAMirror_Plus1.01a.png",
+            "sourceType": "FILE",
+            "category": "MIRRORING",
+            "version": "1.01a",
+            "versionCode": 3,
+            "downloadUrl": "https://github.com/pablosguajardo/AAApps/raw/refs/heads/master/AAMirror_Plus1.01a.apk"
         },
         {
             "appId": "pm",

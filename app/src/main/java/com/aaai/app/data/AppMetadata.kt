@@ -35,5 +35,9 @@ data class AppMetadata(
     val githubRepo: String? = null,
     /** Optional catalog "action": "g" = install as Android Auto game, "n" = navigation. Else normal install. */
     val action: String? = null,
+    /** Optional catalog "carUrl": web page that NAVIGATION mode hosts in its own WebView on the car screen. */
+    val carUrl: String? = null,
+    /** Installed copy is signed with a different key than AAAI's current one: it cannot be updated in place. */
+    val signatureMismatch: Boolean = false,
     val downloadState: DownloadState = DownloadState.IDLE
 )

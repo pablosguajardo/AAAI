@@ -6,6 +6,8 @@ Project page: <https://github.com/pablosguajardo/AAAI>
 
 > **Disclaimer:** This project is provided for **testing and evaluation purposes only**. It is offered "as is", without warranty of any kind. The author assumes no responsibility or liability for any damage, data loss, malfunction or other consequences resulting from the use of this app or of any app installed through it. Use it at your own risk.
 
+> **App Responsibility Notice:** AAAI is a catalog of Android Auto apps published by independent developers on GitHub. Each app belongs to its own author — AAAI only helps you download and install them. Some apps are marked as **Verified**: this means they were tested and confirmed to work with Android Auto at some point, covering basic functionality only — it does not imply any endorsement, security audit, or guarantee of any kind. **AAAI is not responsible for the behaviour, security, or consequences of any third-party app you install through it. Always review the source repository before installing.**
+
 ## What does it do?
 
 - Shows a catalog of Android Auto apps, grouped by category (multimedia, screen mirroring, utilities).
@@ -58,54 +60,9 @@ AAAI is not distributed through the Google Play Store, so Android will ask for a
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_8.jpeg" alt="Screen_8" width="1024">
 
 
-## To do
-
-- **Keep apps updatable after reinstalling AAAI (feasibility study).** Apps installed through AAAI are signed with a key that AAAI generates on first use and stores in its private folder. If AAAI is uninstalled and installed again, that key is lost: the apps are still recognised as installed (their renamed package name is fixed), but Android refuses to update them because the signature differs, so they must be uninstalled first (their data is lost). Two options to evaluate:
-  - **Deterministic per-device key.** Derive the signing key from a device identifier (e.g. `ANDROID_ID`) plus a fixed salt, with a fixed certificate (serial number, validity dates and name), so the same key is regenerated after a reinstall. Points to check: `ANDROID_ID` changes with a factory reset and, on Android 8+, depends on the signing key of the app (debug vs release builds give different values); the salt cannot be secret because the project is open source, so the key is weaker than a random one; the key derivation must stay identical across BouncyCastle versions; apps already installed with the current random key would not benefit.
-  - **Include the keystore in Android's automatic backup** (as is already done for the install counter), so it can be restored on reinstall. Points to check: restoring is not guaranteed, especially for APKs installed manually, and it depends on the user having backup enabled.
-
 ## Advertising
 
 AAAI shows a small banner ad at the bottom of the main screen and, once in a while (every few installs), a full-screen ad so that development can continue. Ads are provided by [Start.io](https://www.start.io). Thank you for your support!
-
-## Credits
-
-The apps listed in AAAI belong to their respective developers. Many of them are downloaded straight from these GitHub repositories:
-
-- [CarStream](https://github.com/thekirankumar/carstream-android-auto) – thekirankumar/carstream-android-auto
-- [Fermata Auto](https://github.com/AndreyPavlenko/Fermata) – AndreyPavlenko/Fermata
-- [ScreenOnAuto](https://github.com/slzn/ScreenOnAuto-releases) – slzn/ScreenOnAuto-releases
-- [Performance Monitor](https://github.com/jilleb/mqb-pm) – jilleb/mqb-pm
-- [AATorque](https://github.com/agronick/aa-torque) – agronick/aa-torque
-- [AA Passenger](https://github.com/martoreto/aapassenger) – martoreto/aapassenger
-- [AA Browser](https://github.com/kododake/AABrowser) – kododake/AABrowser
-- [AAAnything](https://github.com/kododake/AAAnything) – kododake/AAAnything
-- [Widgets For Android Auto](https://github.com/ns130291/widgets-for-auto) – ns130291/widgets-for-auto
-- [Nav2Contacts](https://github.com/frankkienl/Nav2Contacts) – frankkienl/Nav2Contacts
-- [HomeCar](https://github.com/RenanEspinar/HomeCar) – RenanEspinar/HomeCar
-- [YT Auto](https://github.com/begati/yt-auto) – begati/yt-auto
-- [7x Lyrics](https://github.com/c9hama/7x-Lyrics) – c9hama/7x-Lyrics
-- [RadioDroid](https://github.com/morckx/RadioDroid) – morckx/RadioDroid
-- [YouTube Companion](https://github.com/seinist/youtube-companion) – seinist/youtube-companion
-- [AA Browser CarWeb](https://github.com/fcaronte/AABrowser) – fcaronte/AABrowser
-- [Fermata-Xtream](https://github.com/malebuffy/Fermata-Xtream) – malebuffy/Fermata-Xtream
-- [Meld](https://github.com/FrancescoGrazioso/Meld) – FrancescoGrazioso/Meld
-- [SpotiDuck](https://github.com/23fpsz/SpotiDuck-Releases) – 23fpsz/SpotiDuck-Releases
-- [Metrolist](https://github.com/MetrolistGroup/Metrolist) – MetrolistGroup/Metrolist
-- [Vela Maps](https://github.com/PimpinPumpkin/Vela) – PimpinPumpkin/Vela
-- [RF Sentinel](https://github.com/CIS-C0/RFSentinel) – CIS-C0/RFSentinel
-- [Nuomi Player](https://github.com/charlottejas/NuomiPlayer) – charlottejas/NuomiPlayer
-- [Lumora Player](https://github.com/LumoraPlayer/Lumora) – LumoraPlayer/Lumora
-- [AA Mods](https://github.com/ImNoammm/aa-mods) – ImNoammm/aa-mods
-- [xFermaTube](https://github.com/juntulis/xFermaTube) – juntulis/xFermaTube
-- [Horizon Maps](https://github.com/benbishop028-arch/Horizon-Maps) – benbishop028-arch/Horizon-Maps
-- [Bit Chord](https://github.com/kushagrasinghx/BitChord) – kushagrasinghx/BitChord
-- [Fermata X](https://github.com/chuoinho/FermataX) – chuoinho/FermataX
-- [Dash Glance Clock](https://github.com/FilipNone/DashGlance-Clock) – FilipNone/DashGlance-Clock
-- [Calculator](https://github.com/FossifyOrg/Calculator) – FossifyOrg/Calculator
-
-
-This project is **not affiliated with, endorsed by, or sponsored by** any of them. Please check each project's repository for its own license and terms.
 
 ## License
 

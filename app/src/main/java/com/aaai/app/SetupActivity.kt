@@ -70,10 +70,10 @@ class SetupActivity : AppCompatActivity() {
             }
         }
 
-        // Continue to main app
+        // Continue to main app (GithubSearchActivity is the new main screen)
         findViewById<Button>(R.id.btnContinue).setOnClickListener {
             markSetupDone(this)
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, GithubSearchActivity::class.java))
             finish()
         }
     }

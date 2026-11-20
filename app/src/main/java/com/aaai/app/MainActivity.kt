@@ -45,7 +45,9 @@ import com.startapp.sdk.adsbase.Ad
 import com.startapp.sdk.adsbase.StartAppAd
 import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener
 import com.startapp.sdk.adsbase.StartAppSDK
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -64,6 +66,9 @@ class MainActivity : AppCompatActivity() {
     private var installDialogMessage: TextView? = null
     private var installDialogProgress: ProgressBar? = null
     private var currentInstallApp: AppMetadata? = null
+    private var currentInstallTag: String? = null
+    /** Cache key of the install in progress: the appId, or the custom URL / file key. Used to clean up after it. */
+    private var currentInstallKey: String? = null
 
     private lateinit var etApkUrl: EditText
     private lateinit var spAutoMode: Spinner
@@ -83,6 +88,17 @@ class MainActivity : AppCompatActivity() {
     private val packageChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Log.d(TAG, "Package event: ${intent.action} ${intent.data}")
+            val removed = intent.action == Intent.ACTION_PACKAGE_REMOVED &&
+                    !intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)
+            val pkg = intent.data?.schemeSpecificPart
+            if (removed && pkg != null) {
+                // Instant feedback: flip that app's button now, the full refresh confirms it afterwards
+                lifecycleScope.launch {
+                    if (appMetadataService.markPackageRemoved(pkg)) {
+                        adapter.submitList(appMetadataService.getAllApps())
+                    }
+                }
+            }
             refreshInstallStates()
         }
     }
@@ -143,6 +159,13 @@ class MainActivity : AppCompatActivity() {
         }
         ContextCompat.registerReceiver(this, packageChangeReceiver, filter, ContextCompat.RECEIVER_EXPORTED)
 
+        // Leftovers of URL / local-file installs that were never completed (cancelled, failed...)
+        lifecycleScope.launch(Dispatchers.IO) {
+            listOf(DownloadAndInstallService.CUSTOM_URL_KEY, DownloadAndInstallService.CUSTOM_FILE_KEY).forEach {
+                com.aaai.app.utils.ApkCache.cleanupAfterInstall(cacheDir, it, null)
+            }
+        }
+
         loadApps()
         checkForUpdate()
     }
@@ -166,19 +189,52 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** Re-checks which catalog apps are installed (incl. renamed packages) and updates the list. */
-    private fun refreshInstallStates() {
-        lifecycleScope.launch {
-            appMetadataService.updateInstallationStates()
-            val apps = appMetadataService.getAllApps()
-            if (apps.isNotEmpty()) adapter.submitList(apps)
+    // Package events, onResume and install results all trigger a refresh: merge them into one extra pass at most
+    private var refreshing = false
+    private var refreshAgain = false
 
-            // Check GitHub for newer releases of installed apps (throttled to once per 24h per app)
-            if (appMetadataService.refreshLatestGithubTags()) {
-                val updated = appMetadataService.getAllApps()
-                if (updated.isNotEmpty()) adapter.submitList(updated)
+    private fun refreshInstallStates() {
+        if (refreshing) {
+            refreshAgain = true
+            return
+        }
+        refreshing = true
+        lifecycleScope.launch {
+            try {
+                do {
+                    refreshAgain = false
+                    appMetadataService.updateInstallationStates()
+                    val apps = appMetadataService.getAllApps()
+                    if (apps.isNotEmpty()) adapter.submitList(apps)
+                } while (refreshAgain)
+            } finally {
+                refreshing = false
             }
-            appMetadataService.lastRefreshWarning?.let {
-                Toast.makeText(this@MainActivity, "Could not check for updates. $it", Toast.LENGTH_LONG).show()
+            checkGithubTagsInBackground()
+        }
+    }
+
+    private var checkingTags = false
+
+    /** GitHub queries are network calls: they run apart so they never delay the local install/uninstall refresh. */
+    private fun checkGithubTagsInBackground() {
+        if (checkingTags) return
+        checkingTags = true
+        lifecycleScope.launch {
+            try {
+                // Throttled to once per 24h per app; the list is updated as soon as any tag changes
+                // The callback runs from IO threads, one call per app: update the list on the main thread
+                appMetadataService.refreshLatestGithubTags(onAppUpdated = {
+                    val updated = appMetadataService.getAllApps()
+                    withContext(Dispatchers.Main) {
+                        if (updated.isNotEmpty()) adapter.submitList(updated)
+                    }
+                })
+                appMetadataService.lastRefreshWarning?.let {
+                    Toast.makeText(this@MainActivity, "Could not check for updates. $it", Toast.LENGTH_LONG).show()
+                }
+            } finally {
+                checkingTags = false
             }
         }
     }
@@ -213,6 +269,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.search_github -> {
+                startActivity(Intent(this, GithubSearchActivity::class.java))
+                true
+            }
             R.id.infos -> {
                 startActivity(Intent(this, AboutActivity::class.java))
                 true
@@ -225,13 +285,52 @@ class MainActivity : AppCompatActivity() {
                 checkForUpdateManually()
                 true
             }
+            R.id.clear_apps_cache -> {
+                clearAppsCache()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    /** Menu option: deletes only the downloaded APK files; app data, settings and GitHub/icon caches stay. */
+    private fun clearAppsCache() {
+        val size = com.aaai.app.utils.ApkCache.measure(cacheDir)
+        if (size.files == 0) {
+            Toast.makeText(this, "No downloaded apps to clear", Toast.LENGTH_SHORT).show()
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Clear apps cache")
+            .setMessage(
+                "Delete ${size.files} downloaded APK file(s) (${com.aaai.app.utils.ApkCache.format(size.bytes)})?\n\n" +
+                        "Installed apps and their data are not affected. Apps will be downloaded again when you " +
+                        "install or update them."
+            )
+            .setPositiveButton("Clear") { _, _ ->
+                lifecycleScope.launch {
+                    val result = withContext(Dispatchers.IO) { com.aaai.app.utils.ApkCache.clearAll(cacheDir) }
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Freed ${com.aaai.app.utils.ApkCache.format(result.bytes)} (${result.files} file(s))",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun loadApps() {
         progressBar.visibility = View.VISIBLE
         tvEmpty.visibility = View.GONE
+
+        // First run (or catalog changed): the apps are scanned once, so say so. Later runs read the saved state.
+        val firstScan = getSharedPreferences("catalog_meta", Context.MODE_PRIVATE).getInt("catalog_hash", 0) == 0
+        if (firstScan) {
+            tvEmpty.text = "Loading apps for the first time..."
+            tvEmpty.visibility = View.VISIBLE
+        }
 
         lifecycleScope.launch {
             try {
@@ -244,6 +343,7 @@ class MainActivity : AppCompatActivity() {
                         tvEmpty.text = "No apps found"
                         tvEmpty.visibility = View.VISIBLE
                     } else {
+                        tvEmpty.visibility = View.GONE
                         adapter.submitList(apps)
                     }
                 }
@@ -427,6 +527,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onInstallClick(app: AppMetadata) {
+        // Installed copy signed with a different key (AAAI was reinstalled): Android would reject the update
+        if (app.isInstalled && app.signatureMismatch) {
+            AlertDialog.Builder(this)
+                .setTitle("Reinstall ${app.appName}")
+                .setMessage(
+                    "The installed ${app.appName} was signed with a different AAAI key (AAAI was probably " +
+                            "uninstalled and installed again), so Android will not update it in place.\n\n" +
+                            "Uninstall it first (its data will be removed), then install the new version."
+                )
+                .setPositiveButton("Uninstall") { _, _ ->
+                    val pkg = appMetadataService.resolveInstalledPackage(app.packageName)
+                    if (pkg != null) {
+                        InstalledVersionTracker.clearInstalled(this, app.appId)
+                        startActivity(Intent(Intent.ACTION_DELETE, Uri.parse("package:$pkg")))
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+            return
+        }
+
         // Only sourceType == GITHUB_RELEASE uses the GitHub versions list; everything else uses downloadUrl
         if (app.isGithubRelease()) {
             showGithubVersions(app)
@@ -477,8 +598,13 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    // True while the releases are being fetched; with the version list already on screen, extra taps are ignored
+    private var githubBusy = false
+    private var versionsDialog: AlertDialog? = null
+
     /** Lists up to 10 GitHub releases (newest first) so the user can choose which one to install. */
     private fun showGithubVersions(app: AppMetadata) {
+        if (githubBusy || versionsDialog?.isShowing == true) return
         val repo = app.githubRepo ?: return
         if (!canInstallPackages()) {
             checkAndRequestInstallPermission()
@@ -489,6 +615,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchGithubVersions(app: AppMetadata, repo: String) {
+        githubBusy = true
         showProgressDialog("Fetching versions")
         installDialogMessage?.text = "Querying GitHub releases..."
         installDialogProgress?.isIndeterminate = true
@@ -499,10 +626,12 @@ class MainActivity : AppCompatActivity() {
                 releaseService.getReleases(repo)
             } catch (e: Exception) {
                 Log.e(TAG, "GitHub releases error for $repo", e)
+                githubBusy = false
                 installDialog?.dismiss()
                 handleInstallError("Could not load versions. ${NetworkErrors.describe(e)}")
                 return@launch
             }
+            githubBusy = false
             installDialog?.dismiss()
 
             // GitHub could not be reached but an older saved copy was used: let the user know
@@ -515,11 +644,15 @@ class MainActivity : AppCompatActivity() {
                 return@launch
             }
 
-            // Remember the newest tag so the list can flag "update available" later
+            // Remember the newest tag even if the app is not installed yet: after installing an older version
+            // the "Update" button is then right on the first scan, without another GitHub query.
+            InstalledVersionTracker.setLatestTag(this@MainActivity, app.appId, releases[0].tag)
             if (app.isInstalled) {
-                InstalledVersionTracker.setLatestTag(this@MainActivity, app.appId, releases[0].tag)
-                appMetadataService.updateInstallationStates()
-                adapter.submitList(appMetadataService.getAllApps())
+                // Slow (scans packages and signatures): refresh the list in the background, never before the dialog
+                lifecycleScope.launch {
+                    appMetadataService.updateInstallationStates()
+                    adapter.submitList(appMetadataService.getAllApps())
+                }
             }
 
             val installedTag = InstalledVersionTracker.getInstalledTag(this@MainActivity, app.appId)
@@ -534,7 +667,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }.toTypedArray()
 
-            AlertDialog.Builder(this@MainActivity)
+            versionsDialog = AlertDialog.Builder(this@MainActivity)
                 .setTitle("${app.appName} — choose version")
                 .setItems(labels) { _, which -> onGithubVersionSelected(app, releases, which, installedTag) }
                 .setNegativeButton("Cancel", null)
@@ -582,6 +715,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun startGithubInstall(app: AppMetadata, tag: String, assetUrl: String) {
         currentInstallApp = app
+        currentInstallTag = tag
+        currentInstallKey = app.appId
         showProgressDialog("Installing ${app.appName} $tag")
         lifecycleScope.launch {
             downloadService.installGithubRelease(
@@ -617,6 +752,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun startInstallFromUrl(url: String) {
         currentInstallApp = null
+        currentInstallTag = null
+        currentInstallKey = DownloadAndInstallService.CUSTOM_URL_KEY
         showProgressDialog("Installing from URL")
         lifecycleScope.launch {
             downloadService.installFromUrl(
@@ -676,6 +813,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun startInstallFromFile(uri: Uri) {
         currentInstallApp = null
+        currentInstallTag = null
+        currentInstallKey = DownloadAndInstallService.CUSTOM_FILE_KEY
         showProgressDialog("Installing from file")
         lifecycleScope.launch {
             downloadService.installFromFile(
@@ -716,6 +855,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun startInstall(app: AppMetadata) {
         currentInstallApp = app
+        currentInstallTag = null
+        currentInstallKey = app.appId
         showProgressDialog("Installing ${app.appName}")
         lifecycleScope.launch {
             downloadService.downloadAndInstall(
@@ -763,8 +904,13 @@ class MainActivity : AppCompatActivity() {
         }
         if (requestCode != REQUEST_INSTALL) return
 
-        val appName = currentInstallApp?.appName ?: "App"
+        val installedApp = currentInstallApp
+        val installedTag = currentInstallTag
+        val installedKey = currentInstallKey
+        val appName = installedApp?.appName ?: "App"
         currentInstallApp = null
+        currentInstallTag = null
+        currentInstallKey = null
 
         Log.d(TAG, "onActivityResult: appName=$appName resultCode=$resultCode data=${data?.extras}")
 
@@ -777,6 +923,15 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "$appName installed successfully!", Toast.LENGTH_LONG).show()
                 // Only successful installs count toward the next ad
                 InstallAdCounter.registerSuccessfulInstall(this)
+                // Installed OK: drop this app's older downloads and temporary install files, keep the current one
+                if (installedKey != null) {
+                    lifecycleScope.launch {
+                        val freed = withContext(Dispatchers.IO) {
+                            com.aaai.app.utils.ApkCache.cleanupAfterInstall(cacheDir, installedKey, installedTag)
+                        }
+                        Log.d(TAG, "Cache cleanup for $installedKey: ${freed.files} file(s), ${freed.bytes} bytes")
+                    }
+                }
             }
             Activity.RESULT_CANCELED -> {
                 Log.w(TAG, "Install CANCELED: $appName")

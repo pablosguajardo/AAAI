@@ -8,3 +8,4 @@ build
 *.bak
 .kotlin
 Extras
+tools/repo-indexer/.token

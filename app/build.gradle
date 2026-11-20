@@ -11,6 +11,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    androidResources {
+        // The .dex files in assets/autoconv are read at runtime with AssetManager.open(),
+        // which cannot handle compressed assets. Keep them uncompressed.
+        noCompress '.dex'
+    }
+
     packaging {
         resources {
             excludes += [
@@ -60,8 +66,8 @@ android {
         applicationId = "com.aaai.app"
         minSdk = 24
         targetSdk = 37
-        versionCode = 5
-        versionName = "1.0.4"
+        versionCode = 6
+        versionName = "1.1.0"
         base.archivesName = "AAAI-" + versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

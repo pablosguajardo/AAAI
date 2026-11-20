@@ -9,7 +9,7 @@ class LauncherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // Show setup only the first time
         if (SetupActivity.isSetupDone(this)) {
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, GithubSearchActivity::class.java))
         } else {
             startActivity(Intent(this, SetupActivity::class.java))
         }
