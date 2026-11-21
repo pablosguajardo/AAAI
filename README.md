@@ -36,7 +36,7 @@ AAAI is not distributed through the Google Play Store, so Android will ask for a
    - Temporarily turn off scanning: open the **Google Play Store**, tap your profile picture, go to **Play Protect > Settings (gear icon)** and disable **Scan apps with Play Protect**. You can turn it back on after installing.
 4. **Install the app** and open it.
 
-<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_3.jpg" alt="App3" width="250"><img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_4.jpg" alt="App4" width="250">
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_6.jpg" alt="App6" width="250"><img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_7.jpg" alt="App7" width="250">
 
 ### Using AAAI
 
@@ -49,14 +49,23 @@ AAAI is not distributed through the Google Play Store, so Android will ask for a
 
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_1.jpg" alt="App1" width="250"><img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_2.jpg" alt="App2" width="250">
 
+<img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_3.jpg" alt="App3" width="250"><img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/App_4.jpg" alt="App4" width="250">
+
 
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_1.jpeg" alt="Screen_1" width="1024">
+
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_2.jpeg" alt="Screen_2" width="1024">
+
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_3.jpeg" alt="Screen_3" width="1024">
+
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_4.jpeg" alt="Screen_4" width="1024">
+
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_5.jpeg" alt="Screen_5" width="1024">
+
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_6.jpeg" alt="Screen_6" width="1024">
+
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_7.jpeg" alt="Screen_7" width="1024">
+
 <img src="https://raw.githubusercontent.com/pablosguajardo/AAAI/refs/heads/master/img/Screen_8.jpeg" alt="Screen_8" width="1024">
 
 
