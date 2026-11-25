@@ -154,7 +154,12 @@ class GithubSearchActivity : AppCompatActivity() {
         // Computed based on selected group
         private const val MIN_TOPIC_COUNT = 1  // fallback, overridden per group
         private const val REQUEST_INSTALL = 2001
+        private const val REQUEST_SELF_UPDATE = 1002
     }
+
+    // Self-update state
+    private var pendingUpdate: UpdateChecker.UpdateInfo? = null
+    private var updateDialog: AlertDialog? = null
 
     // -------------------------------------------------------------------------
     // Lifecycle
@@ -184,6 +189,7 @@ class GithubSearchActivity : AppCompatActivity() {
         btnLoadMore.setOnClickListener { loadPage(currentPage + 1, append = true) }
 
         lifecycleScope.launch { openDb() }
+        checkForUpdate()
 
         // Register package change receiver to refresh install states
         val filter = IntentFilter().apply {
@@ -210,6 +216,13 @@ class GithubSearchActivity : AppCompatActivity() {
         invalidateInstallCache()
         if (dbReady) refreshInstallStates()
         checkAutoUpdatesIfConnected()
+        // A mandatory update must stay on screen: show it again if the user came back without updating
+        val pending = pendingUpdate
+        if (pending != null && pending.mandatory &&
+            updateDialog?.isShowing != true && installDialog?.isShowing != true
+        ) {
+            showUpdateDialog(pending)
+        }
     }
 
     override fun onStart() {
@@ -328,7 +341,7 @@ class GithubSearchActivity : AppCompatActivity() {
             R.id.infos        -> { startActivity(Intent(this, AboutActivity::class.java)); true }
             R.id.show_intro   -> { startActivity(Intent(this, SetupActivity::class.java)); true }
             R.id.auto_alerts  -> { handleAutoAlertsMenu(); true }
-            R.id.check_update -> { checkForUpdate(); true }
+            R.id.check_update -> { checkForUpdateManually(); true }
             R.id.clear_apps_cache -> { clearAppsCache(); true }
             else -> super.onOptionsItemSelected(item)
         }
@@ -354,23 +367,117 @@ class GithubSearchActivity : AppCompatActivity() {
             .show()
     }
 
+    /**
+     * Silent check run automatically at startup. Never bothers the user when up to date or when
+     * the check fails (offline, etc). Shows [showUpdateDialog] only when a newer release exists.
+     */
     private fun checkForUpdate() {
-        Toast.makeText(this, "Checking for updates...", Toast.LENGTH_SHORT).show()
         lifecycleScope.launch {
-            val info = UpdateChecker(this@GithubSearchActivity).check(manual = true)
+            val info = UpdateChecker(this@GithubSearchActivity).check() ?: return@launch
+            pendingUpdate = info
+            showUpdateDialog(info)
+        }
+    }
+
+    /** Formats a duration like "2 h 45 min" / "12 min" / "less than a minute". */
+    private fun formatWait(ms: Long): String {
+        val totalMin = (ms + 59_999) / 60_000
+        if (totalMin <= 0) return "less than a minute"
+        val h = totalMin / 60
+        val m = totalMin % 60
+        return when {
+            h > 0 && m > 0 -> "$h h $m min"
+            h > 0 -> "$h h"
+            else -> "$m min"
+        }
+    }
+
+    /**
+     * Menu option: uses its own cache (UpdateChecker.MANUAL_CHECK_INTERVAL_MS), separate from the
+     * automatic check. The first press (or the first one after that interval) queries GitHub; presses
+     * in between reuse the saved result and tell the user how long to wait. Always reports a result.
+     */
+    private fun checkForUpdateManually() {
+        val checker = UpdateChecker(this)
+        val waitMs = checker.manualCooldownRemainingMs()
+        val waitText = if (waitMs > 0) {
+            "You can check GitHub again in ${formatWait(waitMs)}."
+        } else null
+        if (waitText == null) {
+            Toast.makeText(this, "Checking for updates...", Toast.LENGTH_SHORT).show()
+        }
+        lifecycleScope.launch {
+            val info = checker.check(manual = true)
             if (info != null) {
-                AlertDialog.Builder(this@GithubSearchActivity)
-                    .setTitle("Update available: ${info.tag}")
-                    .setMessage("A new version of AAAI is available.")
-                    .setPositiveButton("View") { _, _ ->
-                        startActivity(Intent(Intent.ACTION_VIEW,
-                            Uri.parse("https://github.com/pablosguajardo/AAAI/releases")))
-                    }
-                    .setNegativeButton("Later", null).show()
-            } else {
-                Toast.makeText(this@GithubSearchActivity,
-                    "AAAI is up to date (v${BuildConfig.VERSION_NAME})", Toast.LENGTH_SHORT).show()
+                if (waitText != null) Toast.makeText(this@GithubSearchActivity, waitText, Toast.LENGTH_LONG).show()
+                pendingUpdate = info
+                showUpdateDialog(info)
+                return@launch
             }
+            val error = checker.lastError
+            if (error != null) {
+                AlertDialog.Builder(this@GithubSearchActivity)
+                    .setTitle("Check for updates")
+                    .setMessage("Could not check for updates. $error")
+                    .setPositiveButton("OK", null)
+                    .show()
+            } else {
+                pendingUpdate = null
+                val base = "AAAI is up to date (v${BuildConfig.VERSION_NAME})."
+                Toast.makeText(
+                    this@GithubSearchActivity,
+                    if (waitText != null) "$base $waitText" else base,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    private fun showUpdateDialog(info: UpdateChecker.UpdateInfo) {
+        if (isFinishing) return
+        val daysLeft = (UpdateChecker.MAX_DAYS_WITHOUT_UPDATE - info.daysSincePublished).coerceAtLeast(0)
+        val builder = AlertDialog.Builder(this).setTitle("Update available: ${info.tag}")
+        if (info.mandatory) {
+            builder.setMessage(
+                "This version is no longer supported. You must update AAAI to keep using it."
+            )
+                .setCancelable(false)
+                .setPositiveButton("Update") { _, _ -> startSelfUpdate(info) }
+                .setNegativeButton("Exit") { _, _ -> finishAffinity() }
+        } else {
+            builder.setMessage(
+                "A new version of AAAI is available."
+            )
+                .setPositiveButton("Update") { _, _ -> startSelfUpdate(info) }
+                .setNegativeButton("Later", null)
+        }
+        updateDialog = builder.show()
+    }
+
+    private fun startSelfUpdate(info: UpdateChecker.UpdateInfo) {
+        if (!canInstallPackages()) {
+            requestInstallPermission()
+            return
+        }
+        showProgressDialog("Updating AAAI ${info.tag}")
+        lifecycleScope.launch {
+            downloadService.installSelfUpdate(
+                info.tag,
+                info.assetUrl,
+                onProgress = { p, m -> runOnUiThread { installDialogMessage?.text = m; installDialogProgress?.progress = p } },
+                onReadyToInstall = { apk ->
+                    runOnUiThread {
+                        installDialog?.dismiss()
+                        startActivityForResult(downloadService.buildInstallIntent(apk), REQUEST_SELF_UPDATE)
+                    }
+                },
+                onError = { msg ->
+                    runOnUiThread {
+                        installDialog?.dismiss()
+                        showError(msg)
+                    }
+                }
+            )
         }
     }
 
@@ -938,6 +1045,25 @@ class GithubSearchActivity : AppCompatActivity() {
     @Suppress("DEPRECATION")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_SELF_UPDATE) {
+            when (resultCode) {
+                Activity.RESULT_OK -> {
+                    Toast.makeText(this, "AAAI updated!", Toast.LENGTH_LONG).show()
+                    pendingUpdate = null
+                }
+                Activity.RESULT_CANCELED -> {
+                    Toast.makeText(this, "Update cancelled", Toast.LENGTH_SHORT).show()
+                    // Mandatory update: user must update or exit — re-show the dialog
+                    pendingUpdate?.let { if (it.mandatory) showUpdateDialog(it) }
+                }
+                else -> {
+                    val code = data?.getIntExtra("android.intent.extra.INSTALL_RESULT", -1) ?: -1
+                    showError("Update failed (code: $code)")
+                    pendingUpdate?.let { if (it.mandatory) showUpdateDialog(it) }
+                }
+            }
+            return
+        }
         if (requestCode != REQUEST_INSTALL) return
         val repo = currentInstallRepo; val tag = currentInstallTag
         currentInstallRepo = null; currentInstallTag = null

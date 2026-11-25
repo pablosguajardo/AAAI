@@ -66,8 +66,8 @@ android {
         applicationId = "com.aaai.app"
         minSdk = 24
         targetSdk = 37
-        versionCode = 7
-        versionName = "1.1.1"
+        versionCode = 8
+        versionName = "1.1.2"
         base.archivesName = "AAAI-" + versionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
