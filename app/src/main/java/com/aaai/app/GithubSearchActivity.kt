@@ -47,11 +47,15 @@ import com.aaai.app.data.GithubRepoDbHelper
 import com.aaai.app.services.DownloadAndInstallService
 import com.aaai.app.services.GitHubReleaseService
 import com.aaai.app.services.UpdateChecker
+import com.aaai.app.utils.InstallAdCounter
 import com.aaai.app.utils.InstalledVersionTracker
 import com.aaai.app.utils.NetworkErrors
 import com.aaai.app.utils.NotificationPermissionHelper
 import com.aaai.app.utils.PackageNaming
+import com.startapp.sdk.adsbase.Ad
+import com.startapp.sdk.adsbase.StartAppAd
 import com.startapp.sdk.adsbase.StartAppSDK
+import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -119,6 +123,9 @@ class GithubSearchActivity : AppCompatActivity() {
     private var githubBusy = false
     private var versionsDialog: AlertDialog? = null
 
+    // Preloaded full-screen ad, shown before every InstallAdCounter.INSTALLS_PER_AD-th successful install
+    private var interstitial: StartAppAd? = null
+
     private val pickApkLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) startInstallFromFile(uri)
     }
@@ -167,10 +174,16 @@ class GithubSearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_github_search)
 
+        // Must run BEFORE setContentView(): the Banner widget inflated by the layout tries to
+        // request its ad as soon as it's attached, and if the SDK isn't initialized yet that
+        // first request silently fails (no crash, no ad, no logged error) — this can explain
+        // very few impressions reported by Start.io despite many installs/opens.
         StartAppSDK.setTestAdsEnabled(BuildConfig.DEBUG)
         StartAppSDK.init(this, "210536031", false)
+        interstitial = StartAppAd(this).also { it.loadAd() }
+
+        setContentView(R.layout.activity_github_search)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -638,13 +651,50 @@ class GithubSearchActivity : AppCompatActivity() {
             if (url.isEmpty()) { Toast.makeText(this, "Enter an APK URL", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
             if (!url.startsWith("http", ignoreCase = true)) { Toast.makeText(this, "URL must start with https://", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
             if (!canInstallPackages()) { requestInstallPermission(); return@setOnClickListener }
-            startInstallFromUrl(url)
+            runAfterAdGate { startInstallFromUrl(url) }
         }
 
         btnPickApk.setOnClickListener {
             if (!canInstallPackages()) { requestInstallPermission(); return@setOnClickListener }
-            pickApkLauncher.launch(arrayOf("*/*"))
+            runAfterAdGate { pickApkLauncher.launch(arrayOf("*/*")) }
         }
+    }
+
+    /**
+     * When the install about to start is due for an ad (every InstallAdCounter.INSTALLS_PER_AD
+     * successful installs), shows the full-screen ad first. [action] runs when the ad is closed,
+     * or right away if no ad is due or none is ready (the user is never blocked).
+     * The counter only increases when an install finishes OK (see onActivityResult).
+     */
+    private fun runAfterAdGate(action: () -> Unit) {
+        if (!InstallAdCounter.shouldShowAdNow(this)) {
+            action()
+            return
+        }
+        val ad = interstitial
+        if (ad == null || !ad.isReady) {
+            // Ad not loaded yet: don't block the user, just try to load one for next time
+            interstitial = StartAppAd(this).also { it.loadAd() }
+            action()
+            return
+        }
+
+        var done = false
+        InstallAdCounter.markAdShown(this)
+        val proceed = {
+            if (!done) {
+                done = true
+                interstitial = StartAppAd(this).also { it.loadAd() }
+                action()
+            }
+        }
+        val shown = ad.showAd(object : AdDisplayListener {
+            override fun adHidden(ad: Ad?) { proceed() }
+            override fun adDisplayed(ad: Ad?) {}
+            override fun adClicked(ad: Ad?) {}
+            override fun adNotDisplayed(ad: Ad?) { proceed() }
+        })
+        if (!shown) proceed()
     }
 
     // -------------------------------------------------------------------------
@@ -872,8 +922,10 @@ class GithubSearchActivity : AppCompatActivity() {
             .setPositiveButton("Choose version") { _, _ ->
                 val mode = AutoMode.fromIndex(spMode.selectedItemPosition)
                 val skipRename = !cbRename.isChecked
-                if (repo.isFileSource) startFileInstall(repo, mode)
-                else startVersionPicker(repo, mode, skipRename)
+                runAfterAdGate {
+                    if (repo.isFileSource) startFileInstall(repo, mode)
+                    else startVersionPicker(repo, mode, skipRename)
+                }
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -1070,6 +1122,8 @@ class GithubSearchActivity : AppCompatActivity() {
         when (resultCode) {
             Activity.RESULT_OK -> {
                 Toast.makeText(this, "${repo?.displayName ?: "App"} installed!", Toast.LENGTH_LONG).show()
+                // Only successful installs count toward the next ad
+                InstallAdCounter.registerSuccessfulInstall(this)
                 if (repo != null && tag != null) {
                     // Mark as installed immediately (RESULT_OK is reliable here)
                     InstalledVersionTracker.forceInstalled(this, repo.appId, tag)
