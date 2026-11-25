@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
+
+    <!-- Search bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="4dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="2dp"
+        android:gravity="center_vertical"
+        android:background="?android:attr/colorBackground">
+
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:hint="Search apps…"
+            android:inputType="text"
+            android:maxLines="1"
+            android:imeOptions="actionSearch"
+            android:paddingStart="4dp"
+            android:background="@android:drawable/edit_text" />
+
+        <ImageButton
+            android:id="@+id/btnClearSearch"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Clear search"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Group chips + Sort -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:gravity="center_vertical"
+        android:background="?android:attr/colorBackground">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Group:"
+            android:textSize="12sp"
+            android:textColor="#AAAAAA"
+            android:layout_marginEnd="4dp" />
+
+        <!-- Verificadas chip (default selected) -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipVerified"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Verified"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:textSize="11sp"
+            android:checked="true"
+            app:chipMinHeight="32dp" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAndroidAuto"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="AA"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:textSize="11sp"
+            android:layout_marginStart="4dp"
+            app:chipMinHeight="32dp" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAndroid"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="Android"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:textSize="11sp"
+            android:layout_marginStart="4dp"
+            app:chipMinHeight="32dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <Spinner
+            android:id="@+id/spSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="110dp" />
+    </LinearLayout>
+
+    <!-- Topic filter row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp"
+        android:gravity="center_vertical"
+        android:background="?android:attr/colorBackground">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Topic:"
+            android:textSize="12sp"
+            android:textColor="#AAAAAA"
+            android:layout_marginEnd="4dp" />
+
+        <Spinner
+            android:id="@+id/spTopic"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <!-- Disclaimer: Android group -->
+    <TextView
+        android:id="@+id/tvDisclaimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:text="⚠ These apps were not built for Android Auto and may not be compatible."
+        android:textColor="#FF8F00"
+        android:textSize="11sp"
+        android:background="#1AFF8F00"
+        android:visibility="gone" />
+
+    <!-- Result count + Progress -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp">
+
+        <TextView
+            android:id="@+id/tvResultCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#888888"
+            android:textSize="11sp"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Empty / error state -->
+    <TextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:gravity="center"
+        android:textColor="#AAAAAA"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <!-- Results list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:clipToPadding="false" />
+
+    <!-- Load more button -->
+    <Button
+        android:id="@+id/btnLoadMore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Load more"
+        android:textAllCaps="false"
+        android:visibility="gone" />
+
+    <!-- ================================================================ -->
+    <!-- Panel "Instalación manual" — colapsable                          -->
+    <!-- ================================================================ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:elevation="8dp"
+        android:background="?android:attr/colorBackground">
+
+        <!-- Toggle header -->
+        <LinearLayout
+            android:id="@+id/manualInstallHeader"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/tvManualInstallToggle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="▶  Manual installation"
+                android:textSize="13sp"
+                android:textColor="#AAAAAA"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Collapsible content -->
+        <LinearLayout
+            android:id="@+id/manualInstallContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/etApkUrl"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="APK URL (https://...)"
+                    android:inputType="textUri"
+                    android:maxLines="1"
+                    android:imeOptions="actionGo" />
+
+                <Button
+                    android:id="@+id/btnInstallUrl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Install URL"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <Spinner
+                    android:id="@+id/spAutoMode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/btnPickApk"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="From device"
+                    android:textAllCaps="false" />
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/cbManualRename"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Rename package (recommended)"
+                android:checked="true"
+                android:textSize="13sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Disable only if the app fails to install with an error code."
+                android:textSize="11sp"
+                android:textColor="#888888"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Start.io banner -->
+    <com.startapp.sdk.ads.banner.Banner
+        android:id="@+id/startAppBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

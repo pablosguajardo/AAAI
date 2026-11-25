@@ -14,7 +14,7 @@ import java.io.File
 class GithubRepoDbHelper(private val context: Context) {
 
     companion object {
-        private const val TAG = "GithubRepoDbHelper"
+        private const val TAG = "com.aaai.app-GithubRepoDbHelper"
         private const val ASSET_NAME = "github_repos.db"
         private const val PAGE_SIZE = 20
     }
@@ -197,6 +197,41 @@ class GithubRepoDbHelper(private val context: Context) {
                 while (c.moveToNext()) result += c.getLong(0) to c.getString(1)
             }
             Log.d(TAG, "allTopics(group='$group'): ${result.size} topics with cnt>=$minCount")
+        }
+        return result
+    }
+
+    /**
+     * Every repo that has a package name (no paging, no topics). Used by the Android Auto
+     * update notifier so it sees exactly the same apps the main screen shows.
+     */
+    fun allWithPackage(db: SQLiteDatabase): List<GithubRepo> {
+        val sql = """
+            SELECT r.id, r.full_name, r.owner, r.name, r.package_name, r.last_tag,
+                   r.source_type, r.app_name
+            FROM repos r
+            WHERE r.package_name IS NOT NULL AND r.package_name != ''
+        """.trimIndent()
+        val result = mutableListOf<GithubRepo>()
+        db.rawQuery(sql, null).use { c ->
+            while (c.moveToNext()) {
+                result += GithubRepo(
+                    id          = c.getLong(0),
+                    fullName    = c.getString(1),
+                    owner       = c.getString(2),
+                    name        = c.getString(3),
+                    description = null,
+                    stars       = 0,
+                    packageName = c.getString(4) ?: "",
+                    avatarUrl   = null,
+                    lastTag     = c.getString(5),
+                    groupName   = null,
+                    pushedAt    = null,
+                    topics      = emptyList(),
+                    sourceType  = c.getString(6) ?: "github",
+                    appName     = c.getString(7)
+                )
+            }
         }
         return result
     }

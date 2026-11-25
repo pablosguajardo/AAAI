@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Declares this app as Android Auto compatible.
+    The "notification" use allows the app to surface notifications
+    on the Android Auto head unit display.
+    Required for notifications posted by AutoUpdateNotifier to appear
+    on the car screen when the phone is connected to Android Auto.
+-->
+<automotiveApp>
+    <!-- "template" habilita CarAppService (pantallas en el head unit via Car App Library) -->
+    <uses name="template" />
+</automotiveApp>

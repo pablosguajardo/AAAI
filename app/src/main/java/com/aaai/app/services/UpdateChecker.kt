@@ -23,7 +23,7 @@ class UpdateChecker(private val context: Context) {
     )
 
     companion object {
-        private const val TAG = "UpdateChecker"
+        private const val TAG = "com.aaai.app-UpdateChecker"
 
         /** Repository whose releases are used to update this app. */
         const val UPDATE_REPO = "pablosguajardo/AAAI"

@@ -40,15 +40,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.chip.Chip
 import com.aaai.app.adapters.GithubRepoAdapter
+import com.aaai.app.auto.AutoUpdateNotifier
 import com.aaai.app.autoconv.AutoMode
 import com.aaai.app.data.GithubRepo
 import com.aaai.app.data.GithubRepoDbHelper
-import com.aaai.app.services.AppMetadataService
 import com.aaai.app.services.DownloadAndInstallService
 import com.aaai.app.services.GitHubReleaseService
 import com.aaai.app.services.UpdateChecker
 import com.aaai.app.utils.InstalledVersionTracker
 import com.aaai.app.utils.NetworkErrors
+import com.aaai.app.utils.NotificationPermissionHelper
 import com.aaai.app.utils.PackageNaming
 import com.startapp.sdk.adsbase.StartAppSDK
 import kotlinx.coroutines.Dispatchers
@@ -94,7 +95,6 @@ class GithubSearchActivity : AppCompatActivity() {
     private lateinit var dbHelper: GithubRepoDbHelper
     private var db: SQLiteDatabase? = null
     private lateinit var adapter: GithubRepoAdapter
-    private lateinit var appMetadataService: AppMetadataService
     private lateinit var downloadService: DownloadAndInstallService
 
     private var selectedGroup: String = GROUP_VERIFIED
@@ -123,8 +123,25 @@ class GithubSearchActivity : AppCompatActivity() {
         if (uri != null) startInstallFromFile(uri)
     }
 
+    // Android 13+: request POST_NOTIFICATIONS (used from the menu item)
+    private val requestNotificationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            NotificationPermissionHelper.markAsked(this)
+        }
+
+    // Registered dynamically (not in the manifest) so it only receives while the app is alive —
+    // a manifest-declared receiver for this action is silently dropped by Android when the app
+    // is not running ("Background execution not allowed").
+    private var carConnectionReceiverRegistered = false
+    private val carConnectionReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            Log.d(TAG, "CAR_CONNECTION_UPDATED received")
+            checkAutoUpdatesIfConnected()
+        }
+    }
+
     companion object {
-        private const val TAG = "GithubSearchActivity"
+        private const val TAG = "com.aaai.app-GithubSearchActivity"
         const val GROUP_VERIFIED = "verified"
         const val GROUP_AUTO = "android-auto"
         const val GROUP_ANDROID = "android"
@@ -155,7 +172,6 @@ class GithubSearchActivity : AppCompatActivity() {
         supportActionBar?.title = getString(R.string.app_name)
 
         bindViews()
-        appMetadataService = AppMetadataService(this)
         downloadService    = DownloadAndInstallService(this)
         dbHelper           = GithubRepoDbHelper(this)
 
@@ -189,9 +205,76 @@ class GithubSearchActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        maybeAskNotificationPermission()
         // Invalidate cache on resume so reinstall/uninstall from outside is reflected
         invalidateInstallCache()
         if (dbReady) refreshInstallStates()
+        checkAutoUpdatesIfConnected()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (!carConnectionReceiverRegistered) {
+            ContextCompat.registerReceiver(
+                this,
+                carConnectionReceiver,
+                IntentFilter("androidx.car.app.connection.action.CAR_CONNECTION_UPDATED"),
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            carConnectionReceiverRegistered = true
+        }
+    }
+
+    override fun onStop() {
+        if (carConnectionReceiverRegistered) {
+            try { unregisterReceiver(carConnectionReceiver) } catch (_: Exception) {}
+            carConnectionReceiverRegistered = false
+        }
+        super.onStop()
+    }
+
+    /**
+     * If Android Auto is currently connected (checked via its content provider), runs the same
+     * update check used by [AutoUpdateNotifier] so a notification appears while the app is open
+     * (or right when it's reopened with Auto already connected).
+     */
+    private fun checkAutoUpdatesIfConnected() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val connected = try {
+                contentResolver.query(
+                    Uri.parse("content://androidx.car.app.connection"),
+                    arrayOf("CarConnectionState"), null, null, null
+                )?.use { c ->
+                    if (c.moveToNext()) c.getInt(c.getColumnIndexOrThrow("CarConnectionState")) == 2 else false
+                } ?: false
+            } catch (e: Exception) {
+                Log.w(TAG, "Could not read car connection state: ${e.message}")
+                false
+            }
+            Log.d(TAG, "Android Auto connected=$connected")
+            if (connected) {
+                try {
+                    AutoUpdateNotifier(this@GithubSearchActivity).checkAndNotify()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Auto update check failed: ${e.message}", e)
+                }
+            }
+        }
+    }
+
+    private fun maybeAskNotificationPermission() {
+        if (!NotificationPermissionHelper.shouldAsk(this)) return
+        AlertDialog.Builder(this)
+            .setTitle("Android Auto alerts")
+            .setMessage("Allow AAAI to send notifications so you get update alerts on the Android Auto display while driving.")
+            .setPositiveButton("Enable") { _, _ ->
+                NotificationPermissionHelper.markAsked(this)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestNotificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+            .setNegativeButton("Not now") { _, _ -> NotificationPermissionHelper.markAsked(this) }
+            .show()
     }
 
     private fun invalidateInstallCache() {
@@ -244,10 +327,31 @@ class GithubSearchActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.infos        -> { startActivity(Intent(this, AboutActivity::class.java)); true }
             R.id.show_intro   -> { startActivity(Intent(this, SetupActivity::class.java)); true }
+            R.id.auto_alerts  -> { handleAutoAlertsMenu(); true }
             R.id.check_update -> { checkForUpdate(); true }
             R.id.clear_apps_cache -> { clearAppsCache(); true }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun handleAutoAlertsMenu() {
+        if (!NotificationPermissionHelper.isGranted(this)) {
+            NotificationPermissionHelper.markAsked(this)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestNotificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                Toast.makeText(this, "Notifications are enabled automatically on this Android version.", Toast.LENGTH_LONG).show()
+            }
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("🔔 Android Auto alerts")
+            .setMessage(
+                "Notifications are enabled ✓\n\n" +
+                "AAAI will notify you on the Android Auto display when app updates are available."
+            )
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     private fun checkForUpdate() {
@@ -510,21 +614,43 @@ class GithubSearchActivity : AppCompatActivity() {
             // Package not installed: clear install state flags
                 ?: return@map repo.copy(isInstalled = false, hasUpdate = false, signatureMismatch = false)
             // Use installed tag, fall back to pending tag (set right after a successful install)
+            // Saved tag lost (app data cleared / AAAI reinstalled): recover it from the version stamped
+            // inside the installed APK, same as AppMetadataService does. Otherwise "Update" shows as "Open".
+            if (InstalledVersionTracker.getInstalledTag(this, repo.appId) == null) {
+                val stamped = readStampedVersion(installedPkg)
+                Log.d(TAG, "recover ${repo.appId} pkg=$installedPkg stamped=$stamped")
+                stamped?.let { InstalledVersionTracker.recoverInstalled(this, repo.appId, it) }
+            }
             val installedVersion = InstalledVersionTracker.getInstalledTag(this, repo.appId)
                 ?: InstalledVersionTracker.getPendingTagForDisplay(this, repo.appId)
             // latestVersion: prefer what GitHub told us (set in startVersionPicker), fall back to DB
             val latestVersion = InstalledVersionTracker.getLatestTag(this, repo.appId) ?: repo.lastTag
-            // Use VersionCompare (same as AppMetadataService.isNewerTag) — handles GitHub tag formats
-            val hasUpdate = if (installedVersion != null && latestVersion != null
-                && installedVersion != latestVersion) {
+            val hasUpdate = if (installedVersion != null && latestVersion != null && installedVersion != latestVersion) {
+                // Use VersionCompare (same as AppMetadataService.isNewerTag) — handles GitHub tag formats
                 com.aaai.app.utils.VersionCompare.compare(latestVersion, installedVersion)
                     ?.let { it > 0 } ?: (latestVersion != installedVersion)
+            } else if (installedVersion == null && latestVersion != null) {
+                // No tag known at all (installed before version tracking existed, no stamp either):
+                // fall back to the installed APK's own versionName, ignoring pre-release suffixes
+                // (same fallback AppMetadataService used to do).
+                val apkVersionName = try { packageManager.getPackageInfo(installedPkg, 0).versionName } catch (e: Exception) { null }
+                com.aaai.app.utils.VersionCompare.compare(latestVersion, apkVersionName, ignorePreRelease = true)
+                    ?.let { it > 0 } ?: (apkVersionName != null && latestVersion != apkVersionName)
             } else false
             // Signature check: only compute if package is actually installed
             val mismatch = com.aaai.app.utils.SigningCheck.isMismatch(this, installedPkg, ownCert)
             repo.copy(isInstalled = true, installedVersion = installedVersion,
                       hasUpdate = hasUpdate, signatureMismatch = mismatch)
         }
+    }
+
+    /** Version / tag stamped into the installed APK's manifest by ApkPackageRenamer, or null if absent. */
+    private fun readStampedVersion(installedPackage: String): String? = try {
+        packageManager.getApplicationInfo(installedPackage, android.content.pm.PackageManager.GET_META_DATA)
+            .metaData?.getString(com.aaai.app.utils.ApkPackageRenamer.META_CATALOG_VERSION)
+            ?.takeIf { it.isNotBlank() }
+    } catch (e: Exception) {
+        null
     }
 
     private fun refreshInstallStates() {

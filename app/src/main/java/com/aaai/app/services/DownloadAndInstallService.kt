@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
 class DownloadAndInstallService(private val context: Context) {
 
     companion object {
-        private const val TAG = "DownloadAndInstallService"
+        private const val TAG = "com.aaai.app-DownloadAndInstallService"
 
         /**
          * Set to true to always re-download APKs (useful for testing).
@@ -319,7 +319,8 @@ class DownloadAndInstallService(private val context: Context) {
             }
             val apkAfterRename = if (skipRename) {
                 Log.d(TAG, "Package rename skipped by user request")
-                workApk
+                // Still stamp the version so it can be recovered later from the installed APK
+                if (ApkPackageRenamer.stampOnly(workApk, renamedApk, catalogVersion)) renamedApk else workApk
             } else {
                 val newPkg = generateNewPackageName(originalPackage)
                 val renameOk = ApkPackageRenamer.renamePackage(
@@ -333,7 +334,7 @@ class DownloadAndInstallService(private val context: Context) {
                     renamedApk
                 } else {
                     Log.w(TAG, "Rename failed — using original package")
-                    workApk
+                    if (ApkPackageRenamer.stampOnly(workApk, renamedApk, catalogVersion)) renamedApk else workApk
                 }
             }
 

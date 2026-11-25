@@ -1,8 +1,5 @@
 package com.aaai.app.data
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
 /**
  * Catalog entry. Fields read from apps_data.json: appId, appName, packageName, description,
  * iconUrl, sourceType, category, and then either
@@ -11,9 +8,7 @@ import androidx.room.PrimaryKey
  *
  * isInstalled / installedVersion / hasUpdate / downloadState are runtime state computed by the app.
  */
-@Entity(tableName = "app_metadata")
 data class AppMetadata(
-    @PrimaryKey
     val appId: String,
     val appName: String,
     val packageName: String,

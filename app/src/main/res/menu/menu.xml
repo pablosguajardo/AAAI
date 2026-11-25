@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/search_github"
+        android:title="Search App on GitHub"
+        android:icon="@android:drawable/ic_menu_search"
+        android:orderInCategory="1" />
+
+    <item
         android:id="@+id/infos"
         android:title="About"/>
 
@@ -10,8 +16,16 @@
         android:title="Show setup instructions"/>
 
     <item
+        android:id="@+id/auto_alerts"
+        android:title="🔔 Android Auto alerts"/>
+
+    <item
         android:id="@+id/check_update"
         android:title="Check for updates"/>
+
+    <item
+        android:id="@+id/clear_apps_cache"
+        android:title="Clear apps cache"/>
 
     <item
         android:id="@+id/version"

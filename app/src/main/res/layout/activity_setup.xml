@@ -157,6 +157,92 @@
             android:backgroundTint="#2196F3"
             android:textColor="#FFFFFF" />
 
+        <!-- Apps responsibility disclaimer -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="#1A1A2E"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:text="📋"
+                    android:textSize="18sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="@string/about_apps_disclaimer_title"
+                    android:textColor="#90CAF9"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/setup_apps_disclaimer"
+                android:textColor="#B0BEC5"
+                android:textSize="13sp"
+                android:lineSpacingMultiplier="1.4" />
+
+        </LinearLayout>
+
+        <!-- Android Auto notifications (optional) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="#1A2E1A"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:text="🔔"
+                    android:textSize="18sp"
+                    android:gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Android Auto update alerts"
+                    android:textColor="#A5D6A7"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="On the next screen you may be asked to allow notifications. Accepting lets AAAI alert you on the Android Auto display when app updates are available. You can skip this — it only affects Auto alerts."
+                android:textColor="#B0BEC5"
+                android:textSize="13sp"
+                android:lineSpacingMultiplier="1.4" />
+
+        </LinearLayout>
+
         <Button
             android:id="@+id/btnContinue"
             android:layout_width="match_parent"

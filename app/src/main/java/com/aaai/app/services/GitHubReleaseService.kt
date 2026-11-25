@@ -47,7 +47,7 @@ class GitHubReleaseService(private val context: Context) {
     }
 
     companion object {
-        private const val TAG = "GitHubReleaseService"
+        private const val TAG = "com.aaai.app-GitHubReleaseService"
         const val MAX_RELEASES = 10
         const val CACHE_TTL_MS = 24L * 60 * 60 * 1000
 

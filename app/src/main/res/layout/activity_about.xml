@@ -71,6 +71,23 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:text="@string/about_apps_disclaimer_title"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/about_apps_disclaimer"
+                android:textColor="?android:attr/textColorSecondary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
                 android:text="@string/about_ads_title"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="17sp"
@@ -84,30 +101,6 @@
                 android:textColor="?android:attr/textColorSecondary"
                 android:textSize="14sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/about_thirdparty_title"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="17sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="@string/about_thirdparty_intro"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textSize="14sp" />
-
-            <!-- Filled dynamically from the catalog (apps with sourceType GITHUB_RELEASE) -->
-            <LinearLayout
-                android:id="@+id/reposContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="vertical" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

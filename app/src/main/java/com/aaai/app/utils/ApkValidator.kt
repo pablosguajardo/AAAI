@@ -20,7 +20,7 @@ import java.util.zip.ZipFile
  */
 object ApkValidator {
 
-    private const val TAG = "ApkValidator"
+    private const val TAG = "com.aaai.app-ApkValidator"
 
     data class Result(
         val valid: Boolean,
